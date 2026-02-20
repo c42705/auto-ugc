@@ -187,19 +187,20 @@
     </div>
 
     <!-- Top Navigation -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand text-primary fw-bold ms-2" href="#">UX·AI UGC Agent</a>
+            <a class="navbar-brand fw-bold ms-2 text-uppercase tracking-wide" href="#">UX·AI UGC Agent</a>
             <div class="d-flex align-items-center me-2">
                 <div id="pipeline-status-badge" class="badge status-badge text-bg-secondary me-3 my-auto">IDLE</div>
                 <div class="d-flex align-items-center me-3" style="width: 150px;">
-                    <span class="small text-muted text-uppercase fw-bold me-2" style="font-size: 0.7rem;">RAM</span>
-                    <div class="progress shadow-sm flex-grow-1" style="height: 6px;">
+                    <span class="small text-light text-uppercase fw-bold me-2" style="font-size: 0.7rem;">RAM</span>
+                    <div class="progress shadow-sm flex-grow-1"
+                        style="height: 6px; background-color: var(--bs-gray-700);">
                         <div id="ram-progress" class="progress-bar bg-info" role="progressbar" aria-label="RAM Usage"
                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
                     </div>
                 </div>
-                <button class="btn btn-outline-secondary btn-sm fw-bold" data-bs-toggle="modal"
+                <button class="btn btn-outline-light btn-sm fw-bold text-uppercase" data-bs-toggle="modal"
                     data-bs-target="#settingsModal">
                     ⚙ Settings
                 </button>
@@ -228,7 +229,8 @@
                         <input type="text" id="topic-override" class="form-control border-secondary"
                             placeholder="e.g. Fintech UX gaps...">
                     </div>
-                    <button id="btn-run" class="btn btn-success fw-bold px-4 py-2 shadow-sm" style="min-width: 180px;">▶
+                    <button id="btn-run" class="btn btn-success fw-bold px-4 py-2 text-uppercase"
+                        style="min-width: 180px;">▶
                         RUN PIPELINE</button>
                 </div>
             </div>
@@ -468,12 +470,12 @@
             const btn = document.getElementById('btn-run');
             const badge = document.getElementById('pipeline-status-badge');
             if (running) {
-                btn.className = "btn btn-danger fw-bold px-4 py-2 shadow-sm pulse-danger";
+                btn.className = "btn btn-danger fw-bold px-4 py-2 pulse-danger text-uppercase";
                 btn.innerHTML = "⏹ CANCEL PIPELINE";
                 badge.className = 'badge status-badge text-bg-primary me-3 my-auto';
                 badge.innerText = 'RUNNING';
             } else {
-                btn.className = "btn btn-success fw-bold px-4 py-2 shadow-sm";
+                btn.className = "btn btn-success fw-bold px-4 py-2 text-uppercase";
                 btn.innerHTML = "▶ RUN PIPELINE";
                 badge.className = 'badge status-badge text-bg-secondary me-3 my-auto';
                 badge.innerText = 'IDLE';
