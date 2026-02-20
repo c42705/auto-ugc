@@ -27,9 +27,28 @@ socketio = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
 # Initialize Orchestrator with socketio for live updates
 orchestrator = Orchestrator(socketio=socketio)
 
+@app.before_request
+def check_auth():
+    password = os.getenv("UI_PASSWORD")
+    if password and request.path.startswith("/api/") and request.path != "/api/login":
+        client_pwd = request.headers.get("X-UI-Password")
+        if client_pwd != password:
+            return jsonify({"error": "Unauthorized"}), 401
+
 @app.route("/")
 def index():
     return send_from_directory("web", "index.html")
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    password = os.getenv("UI_PASSWORD")
+    if not password:
+        return jsonify({"valid": True}) # No password set = valid
+    
+    data = request.json or {}
+    if data.get("password") == password:
+        return jsonify({"valid": True})
+    return jsonify({"valid": False}), 401
 
 @app.route("/api/run", methods=["POST"])
 def run_pipeline():
@@ -48,6 +67,16 @@ def run_pipeline():
         "message": "Pipeline started",
         "session_id": orchestrator.session_id
     })
+
+@app.route("/api/cancel", methods=["POST"])
+def cancel_pipeline():
+    # Attempt to gracefully kill or reset
+    if orchestrator.status == "running":
+        orchestrator.status = "idle"
+        # Just notify UI
+        socketio.emit('pipeline_log', {'level': 'WARNING', 'msg': 'Pipeline cancelled by user.'})
+        socketio.emit('step_error', {'step': orchestrator.current_step, 'error': 'Cancelled'})
+    return jsonify({"status": "cancelled"})
 
 @app.route("/api/status", methods=["GET"])
 def get_status():
@@ -123,6 +152,7 @@ if __name__ == "__main__":
     check_env()
     
     if args.run:
+        import json
         log.info(f"Starting headless run for topic: {args.run}")
         try:
             results = orchestrator.run_pipeline(topic_override=args.run)

@@ -11,31 +11,45 @@
         body {
             height: 100vh;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .sidebar {
-            height: 100vh;
-            padding: 2rem 1rem;
+        /* Access screen */
+        #login-overlay {
             position: fixed;
-            width: 250px;
-            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bs-body-bg);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .main-content {
-            margin-left: 250px;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 2rem;
-            width: calc(100% - 250px);
+            flex-grow: 1;
+            display: flex;
+            overflow: hidden;
         }
 
-        .status-badge {
-            font-size: 1.2rem;
-            padding: 0.5rem 1rem;
-            width: 100%;
-            display: block;
-            text-align: center;
-            margin-bottom: 1.5rem;
+        .glass-panel {
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .glass-panel.sidebar-left {
+            width: 320px;
+            background-color: var(--bs-body-tertiary);
+            border-right: 1px solid var(--bs-border-color);
+            padding: 2rem 1rem;
+        }
+
+        .glass-panel.main-area {
+            flex-grow: 1;
+            padding: 2rem;
         }
 
         .log-container {
@@ -117,9 +131,24 @@
             }
         }
 
-        #review-panel {
-            display: none;
+        .pulse-danger {
+            animation: pulseDanger 1.5s infinite;
         }
+
+        @keyframes pulseDanger {
+            0% {
+                box-shadow: 0 0 0 0 rgba(var(--bs-danger-rgb), 0.5);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(var(--bs-danger-rgb), 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(var(--bs-danger-rgb), 0);
+            }
+        }
+
 
         .json-editor {
             font-family: var(--bs-font-monospace);
@@ -137,134 +166,149 @@
 
 <body>
 
-    <div class="sidebar bg-body-tertiary border-end shadow-sm">
-        <h1 class="h2 text-primary mt-2">UX·AI UGC</h1>
-        <p class="text-muted text-uppercase small tracking-wide">Content Agent</p>
-        <hr class="border-secondary opacity-25">
-
-        <div id="pipeline-status-badge" class="badge status-badge text-bg-secondary mb-4">IDLE</div>
-
-        <div class="mb-4">
-            <label class="form-label d-flex justify-content-between small text-uppercase">
-                <span class="text-muted">RAM Usage</span>
-                <span id="ram-text" class="fw-bold">--%</span>
-            </label>
-            <div class="progress shadow-sm" style="height: 10px;">
-                <div id="ram-progress" class="progress-bar bg-info" role="progressbar" aria-label="RAM Usage"
-                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+    <!-- Simple Password Overlay -->
+    <div id="login-overlay">
+        <div class="card shadow-lg border-0" style="max-width: 400px; width: 100%;">
+            <div class="card-header text-bg-primary py-3">
+                <h1 class="h5 mb-0 fw-bold">UX·AI UGC access</h1>
             </div>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label small text-muted text-uppercase">Topic Override</label>
-            <input type="text" id="topic-override" class="form-control form-control-sm border-secondary"
-                placeholder="e.g. Fintech UX gaps...">
-        </div>
-
-        <button id="btn-run" class="btn btn-success w-100 mb-4 fw-bold shadow-sm">▶ RUN PIPELINE</button>
-
-        <hr class="border-secondary opacity-25 mb-4">
-
-        <div class="d-flex justify-content-center">
-            <button class="btn btn-outline-secondary btn-sm fw-bold" data-bs-toggle="modal"
-                data-bs-target="#settingsModal">
-                ⚙ Settings
-            </button>
+            <div class="card-body p-4">
+                <form id="login-form">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small text-uppercase fw-bold">System Password</label>
+                        <input type="password" id="ui-password" class="form-control" required
+                            placeholder="Enter password...">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Unlock</button>
+                    <div id="login-error" class="text-danger small mt-2 d-none fw-bold">Incorrect password.</div>
+                </form>
+            </div>
         </div>
     </div>
 
+    <!-- Top Navigation -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand text-primary fw-bold ms-2" href="#">UX·AI UGC Agent</a>
+            <div class="d-flex align-items-center me-2">
+                <div id="pipeline-status-badge" class="badge status-badge text-bg-secondary me-3 my-auto">IDLE</div>
+                <button class="btn btn-outline-secondary btn-sm fw-bold" data-bs-toggle="modal"
+                    data-bs-target="#settingsModal">
+                    ⚙ Settings
+                </button>
+            </div>
+        </div>
+    </nav>
+
     <main class="main-content">
-        <!-- Section 1: Progress -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card shadow-sm border-0">
-                    <div
-                        class="card-header bg-transparent border-bottom-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
-                        <h2 class="h5 mb-0 text-uppercase fw-bold text-primary">Pipeline Progress</h2>
-                        <small id="session-display" class="text-muted"></small>
-                    </div>
-                    <div class="card-body">
-                        <div id="stepper" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
-                            <!-- Steps dynamically inserted here -->
-                        </div>
-                    </div>
+
+        <!-- Vertical Left Sidebar for Pipeline Progress -->
+        <div class="glass-panel sidebar-left shadow-sm">
+            <div class="mb-4">
+                <label class="form-label d-flex justify-content-between small text-uppercase">
+                    <span class="text-muted">RAM Usage</span>
+                    <span id="ram-text" class="fw-bold">--%</span>
+                </label>
+                <div class="progress shadow-sm" style="height: 10px;">
+                    <div id="ram-progress" class="progress-bar bg-info" role="progressbar" aria-label="RAM Usage"
+                        aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
                 </div>
+            </div>
+            <hr class="border-secondary opacity-25 mb-4">
+            <h2 class="h6 text-uppercase fw-bold mb-3 text-muted">Pipeline Progress</h2>
+            <div id="stepper" class="d-flex flex-column gap-1">
+                <!-- Steps dynamically inserted here -->
             </div>
         </div>
 
-        <!-- Section 2: Human Review Panel -->
-        <div id="review-panel" class="row mb-4">
-            <div class="col-12">
-                <div class="card border-warning shadow-lg">
-                    <div class="card-header text-bg-warning d-flex justify-content-between align-items-center py-3">
-                        <h2 class="h5 mb-0 text-dark fw-bold">⏳ Review Window: <span id="review-step-name">--</span>
-                        </h2>
-                        <span id="countdown-text" class="text-dark small text-uppercase">Auto-continuing in --s</span>
-                    </div>
-                    <div class="progress rounded-0" style="height: 8px;">
-                        <div id="countdown-bar" class="progress-bar bg-warning" role="progressbar"
-                            aria-label="Review Countdown" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
-                            style="width: 100%">
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <textarea id="review-json" class="json-editor mb-3"></textarea>
-                        <div class="d-flex justify-content-end gap-2">
-                            <button id="btn-submit-override" class="btn btn-success">✅ Submit My Changes</button>
-                            <button id="btn-continue" class="btn btn-secondary">⏭ Continue Now</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Main Content Area -->
+        <div class="glass-panel main-area">
 
-        <!-- Section 3: Tabs -->
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-transparent border-bottom-0 pt-3 pb-0">
-                        <ul class="nav nav-tabs border-bottom-0" id="mainTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active fw-bold text-uppercase" id="log-tab" data-bs-toggle="tab"
-                                    data-bs-target="#log-pane" type="button" role="tab">Live Log</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link fw-bold text-uppercase" id="script-tab" data-bs-toggle="tab"
-                                    data-bs-target="#script-pane" type="button" role="tab">Script Viewer</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link fw-bold text-uppercase" id="output-tab" data-bs-toggle="tab"
-                                    data-bs-target="#output-pane" type="button" role="tab">Output</button>
-                            </li>
-                        </ul>
+            <div class="card shadow-sm border-0 mb-4 bg-body-tertiary">
+                <div class="card-body p-4 d-flex gap-3 align-items-end">
+                    <div class="flex-grow-1">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Topic Override
+                            (Optional)</label>
+                        <input type="text" id="topic-override" class="form-control border-secondary"
+                            placeholder="e.g. Fintech UX gaps...">
                     </div>
-                    <div class="card-body bg-body-tertiary rounded-bottom">
-                        <div class="tab-content" id="mainTabContent">
-                            <div class="tab-pane fade show active" id="log-pane" role="tabpanel">
-                                <div class="d-flex justify-content-end mb-3">
-                                    <button id="clear-log"
-                                        class="btn btn-sm btn-outline-secondary text-uppercase flex-shrink-0">Clear
-                                        Log</button>
-                                </div>
-                                <div id="log-view" class="log-container shadow-inner"></div>
+                    <button id="btn-run" class="btn btn-success fw-bold px-4 py-2 shadow-sm" style="min-width: 180px;">▶
+                        RUN PIPELINE</button>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="card shadow-sm border-0 mb-5">
+                <div class="card-header bg-transparent border-bottom-0 pt-3 pb-0">
+                    <ul class="nav nav-tabs border-bottom-0" id="mainTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold text-uppercase" id="log-tab" data-bs-toggle="tab"
+                                data-bs-target="#log-pane" type="button" role="tab">Live Log</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold text-uppercase" id="script-tab" data-bs-toggle="tab"
+                                data-bs-target="#script-pane" type="button" role="tab">Script Viewer</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold text-uppercase" id="output-tab" data-bs-toggle="tab"
+                                data-bs-target="#output-pane" type="button" role="tab">Output</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body bg-body-tertiary rounded-bottom">
+                    <div class="tab-content" id="mainTabContent">
+                        <div class="tab-pane fade show active" id="log-pane" role="tabpanel">
+                            <div class="d-flex justify-content-end mb-3">
+                                <button id="clear-log"
+                                    class="btn btn-sm btn-outline-secondary text-uppercase flex-shrink-0">Clear
+                                    Log</button>
                             </div>
-                            <div class="tab-pane fade" id="script-pane" role="tabpanel">
-                                <div id="qa-summary" class="mb-3"></div>
-                                <div id="script-cards" class="row g-3">
-                                    <h3 class="h5 text-center text-muted py-5 mt-4">No script generated yet.</h3>
-                                </div>
+                            <div id="log-view" class="log-container shadow-inner"></div>
+                        </div>
+                        <div class="tab-pane fade" id="script-pane" role="tabpanel">
+                            <div id="qa-summary" class="mb-3"></div>
+                            <div id="script-cards" class="row g-3">
+                                <h3 class="h5 text-center text-muted py-5 mt-4">No script generated yet.</h3>
                             </div>
-                            <div class="tab-pane fade" id="output-pane" role="tabpanel">
-                                <div id="output-view" class="row">
-                                    <h3 class="h5 text-center text-muted py-5 mt-4">Waiting for final render...</h3>
-                                </div>
+                        </div>
+                        <div class="tab-pane fade" id="output-pane" role="tabpanel">
+                            <div id="output-view" class="row">
+                                <h3 class="h5 text-center text-muted py-5 mt-4">Waiting for final render...</h3>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </main>
+
+    <!-- Review Modal -->
+    <div class="modal fade" id="reviewModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="reviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-warning shadow-lg border-2">
+                <div class="modal-header text-bg-warning py-3">
+                    <h2 class="h5 modal-title mb-0 text-dark fw-bold" id="reviewModalLabel">⏳ Review Window: <span
+                            id="review-step-name">--</span></h2>
+                    <span id="countdown-text" class="text-dark small text-uppercase ms-3 mt-1 fw-bold">Auto-continuing
+                        in --s</span>
+                </div>
+                <div class="progress rounded-0" style="height: 8px;">
+                    <div id="countdown-bar" class="progress-bar bg-danger" role="progressbar"
+                        aria-label="Review Countdown" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+                        style="width: 100%"></div>
+                </div>
+                <div class="modal-body bg-body-tertiary">
+                    <textarea id="review-json" class="json-editor mb-3"></textarea>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button id="btn-submit-override" class="btn btn-success fw-bold">✅ Submit My Changes</button>
+                        <button id="btn-continue" class="btn btn-secondary fw-bold">⏭ Continue Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Settings Modal -->
     <div class="modal fade" id="settingsModal" tabindex="-1">
@@ -308,6 +352,51 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
         const socket = io();
+        let sessionToken = sessionStorage.getItem('ui_token');
+        let isRunning = false;
+        let reviewModalInstance = null;
+
+        // API Request wrapper to inject header
+        async function apiCall(url, options = {}) {
+            if (!options.headers) options.headers = {};
+            if (sessionToken) options.headers['X-UI-Password'] = sessionToken;
+            return fetch(url, options);
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pass = document.getElementById('ui-password').value;
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pass })
+            });
+            if (res.ok) {
+                sessionToken = pass;
+                sessionStorage.setItem('ui_token', pass);
+                document.getElementById('login-overlay').style.display = 'none';
+            } else {
+                document.getElementById('login-error').classList.remove('d-none');
+            }
+        });
+
+        // Initialize display if token exists
+        async function checkAuthOnLoad() {
+            if (sessionToken) {
+                const res = await apiCall('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: sessionToken }) });
+                if (res.ok) {
+                    document.getElementById('login-overlay').style.display = 'none';
+                } else {
+                    sessionToken = null;
+                }
+            } else {
+                // Check if server is enforcing auth at all
+                const res = await fetch('/api/login', { method: 'POST', body: JSON.stringify({}) });
+                if (res.ok) document.getElementById('login-overlay').style.display = 'none';
+            }
+        }
+        checkAuthOnLoad();
+
         const steps = [
             "research", "review_research", "ideation", "scripting",
             "review_script", "qa_loop", "review_qa", "voiceover",
@@ -339,7 +428,6 @@
         const stepperEl = document.getElementById('stepper');
         steps.forEach((step, idx) => {
             const el = document.createElement('div');
-            el.className = 'col';
             el.innerHTML = `
                 <div id="step-${step}" class="stepper-item">
                     <div class="stepper-number">${idx + 1}</div>
@@ -352,10 +440,17 @@
             stepperEl.appendChild(el);
         });
 
+        document.addEventListener('DOMContentLoaded', () => {
+            reviewModalInstance = new bootstrap.Modal(document.getElementById('reviewModal'));
+        });
+
         // Socket Listeners
         socket.on('step_start', (data) => updateStep(data.step, 'running'));
         socket.on('step_complete', (data) => updateStep(data.step, 'done', data));
-        socket.on('step_error', (data) => updateStep(data.step, 'error', data));
+        socket.on('step_error', (data) => {
+            updateStep(data.step, 'error', data);
+            setIdleState();
+        });
         socket.on('pipeline_log', (data) => appendLog(data));
         socket.on('ram_update', (data) => updateRamBar(data));
 
@@ -366,9 +461,33 @@
             appendLog({ level: 'SUCCESS', msg: 'Human override applied successfully.' });
         });
 
-        socket.on('pipeline_complete', (data) => showOutputPanel(data));
+        socket.on('pipeline_complete', (data) => {
+            showOutputPanel(data);
+            setIdleState();
+        });
 
         // Core Functions
+        function toggleRunButton(running) {
+            isRunning = running;
+            const btn = document.getElementById('btn-run');
+            const badge = document.getElementById('pipeline-status-badge');
+            if (running) {
+                btn.className = "btn btn-danger fw-bold px-4 py-2 shadow-sm pulse-danger";
+                btn.innerHTML = "⏹ CANCEL PIPELINE";
+                badge.className = 'badge status-badge text-bg-primary me-3 my-auto';
+                badge.innerText = 'RUNNING';
+            } else {
+                btn.className = "btn btn-success fw-bold px-4 py-2 shadow-sm";
+                btn.innerHTML = "▶ RUN PIPELINE";
+                badge.className = 'badge status-badge text-bg-secondary me-3 my-auto';
+                badge.innerText = 'IDLE';
+            }
+        }
+
+        function setIdleState() {
+            toggleRunButton(false);
+        }
+
         function updateStep(step, status, data) {
             const el = document.getElementById(`step-${step}`);
             if (!el) return;
@@ -400,6 +519,7 @@
             const bar = document.getElementById('ram-progress');
             const text = document.getElementById('ram-text');
             bar.style.width = data.percent + '%';
+            bar.setAttribute('aria-valuenow', data.percent);
             text.innerText = data.percent + '%';
 
             if (data.percent > 90) bar.className = 'progress-bar bg-danger';
@@ -411,7 +531,7 @@
             reviewStep = data.step;
             document.getElementById('review-step-name').innerText = stepLabels[data.step] || data.step;
             document.getElementById('review-json').value = JSON.stringify(data.data, null, 2);
-            document.getElementById('review-panel').style.display = 'block';
+            reviewModalInstance.show();
 
             let remaining = data.timeout;
             const total = data.timeout;
@@ -422,6 +542,7 @@
                 const pct = (remaining / total) * 100;
                 const bar = document.getElementById('countdown-bar');
                 bar.style.width = pct + '%';
+                bar.setAttribute('aria-valuenow', pct);
                 document.getElementById('countdown-text').innerText = `Auto-continuing in ${remaining}s`;
 
                 if (remaining <= 20) bar.className = 'progress-bar bg-danger';
@@ -432,12 +553,10 @@
                     hideReviewPanel();
                 }
             }, 1000);
-
-            document.getElementById('review-panel').scrollIntoView({ behavior: 'smooth' });
         }
 
         function hideReviewPanel() {
-            document.getElementById('review-panel').style.display = 'none';
+            if (reviewModalInstance) reviewModalInstance.hide();
             clearInterval(reviewTimer);
         }
 
@@ -503,25 +622,31 @@
 
             // Switch to output tab
             document.getElementById('output-tab').click();
-            document.getElementById('pipeline-status-badge').className = 'badge status-badge text-bg-success mb-4';
+            document.getElementById('pipeline-status-badge').className = 'badge status-badge text-bg-success me-3 my-auto';
             document.getElementById('pipeline-status-badge').innerText = 'COMPLETE';
+            setIdleState();
         }
 
         // Event Listeners
         document.getElementById('btn-run').addEventListener('click', () => {
+            if (isRunning) {
+                apiCall('/api/cancel', { method: 'POST' });
+                setIdleState();
+                return;
+            }
+
             const topic = document.getElementById('topic-override').value;
-            fetch('/api/run', {
+            apiCall('/api/run', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic })
             });
-            document.getElementById('pipeline-status-badge').className = 'badge status-badge text-bg-primary mb-4';
-            document.getElementById('pipeline-status-badge').innerText = 'RUNNING';
+            toggleRunButton(true);
         });
 
         document.getElementById('btn-submit-override').addEventListener('click', () => {
             const content = document.getElementById('review-json').value;
-            fetch(`/api/override/${reviewStep}`, {
+            apiCall(`/api/override/${reviewStep}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(JSON.parse(content))
@@ -530,7 +655,7 @@
         });
 
         document.getElementById('btn-continue').addEventListener('click', () => {
-            fetch(`/api/override/${reviewStep}`, {
+            apiCall(`/api/override/${reviewStep}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({})
@@ -545,7 +670,7 @@
                 ntfy: document.getElementById('setting-ntfy').value,
                 model: document.getElementById('setting-model').value
             };
-            fetch('/api/settings', {
+            apiCall('/api/settings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings)
@@ -565,12 +690,14 @@
 
         // Periodic Status Update
         setInterval(() => {
-            fetch('/api/status').then(r => r.json()).then(data => {
+            apiCall('/api/status').then(r => r.json()).then(data => {
                 updateRamBar({ percent: data.ram_percent });
                 if (data.status === 'running') {
-                    document.getElementById('pipeline-status-badge').innerText = 'RUNNING';
+                    toggleRunButton(true);
+                } else {
+                    if (isRunning) toggleRunButton(false);
                 }
-            });
+            }).catch(() => { });
         }, 5000);
     </script>
 </body>
