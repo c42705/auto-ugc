@@ -138,11 +138,11 @@
 <body>
 
     <div class="sidebar bg-body-tertiary border-end shadow-sm">
-        <h2 class="text-primary mt-2">UX·AI UGC</h2>
+        <h1 class="h2 text-primary mt-2">UX·AI UGC</h1>
         <p class="text-muted text-uppercase small tracking-wide">Content Agent</p>
         <hr class="border-secondary opacity-25">
 
-        <div id="pipeline-status-badge" class="badge status-badge bg-secondary mb-4">IDLE</div>
+        <div id="pipeline-status-badge" class="badge status-badge text-bg-secondary mb-4">IDLE</div>
 
         <div class="mb-4">
             <label class="form-label d-flex justify-content-between small text-uppercase">
@@ -150,7 +150,8 @@
                 <span id="ram-text" class="fw-bold">--%</span>
             </label>
             <div class="progress shadow-sm" style="height: 10px;">
-                <div id="ram-progress" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
+                <div id="ram-progress" class="progress-bar bg-info" role="progressbar" aria-label="RAM Usage"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
             </div>
         </div>
 
@@ -165,20 +166,21 @@
         <hr class="border-secondary opacity-25 mb-4">
 
         <div class="d-flex justify-content-center">
-            <button class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#settingsModal">
+            <button class="btn btn-outline-secondary btn-sm fw-bold" data-bs-toggle="modal"
+                data-bs-target="#settingsModal">
                 ⚙ Settings
             </button>
         </div>
     </div>
 
-    <div class="main-content">
+    <main class="main-content">
         <!-- Section 1: Progress -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card shadow-sm border-0">
                     <div
                         class="card-header bg-transparent border-bottom-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 text-uppercase fw-bold text-primary">Pipeline Progress</h5>
+                        <h2 class="h5 mb-0 text-uppercase fw-bold text-primary">Pipeline Progress</h2>
                         <small id="session-display" class="text-muted"></small>
                     </div>
                     <div class="card-body">
@@ -195,11 +197,14 @@
             <div class="col-12">
                 <div class="card border-warning shadow-lg">
                     <div class="card-header text-bg-warning d-flex justify-content-between align-items-center py-3">
-                        <h5 class="mb-0 text-dark fw-bold">⏳ Review Window: <span id="review-step-name">--</span></h5>
+                        <h2 class="h5 mb-0 text-dark fw-bold">⏳ Review Window: <span id="review-step-name">--</span>
+                        </h2>
                         <span id="countdown-text" class="text-dark small text-uppercase">Auto-continuing in --s</span>
                     </div>
                     <div class="progress rounded-0" style="height: 8px;">
-                        <div id="countdown-bar" class="progress-bar bg-warning" role="progressbar" style="width: 100%">
+                        <div id="countdown-bar" class="progress-bar bg-warning" role="progressbar"
+                            aria-label="Review Countdown" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+                            style="width: 100%">
                         </div>
                     </div>
                     <div class="card-body">
@@ -246,12 +251,12 @@
                             <div class="tab-pane fade" id="script-pane" role="tabpanel">
                                 <div id="qa-summary" class="mb-3"></div>
                                 <div id="script-cards" class="row g-3">
-                                    <h5 class="text-center text-muted py-5 mt-4">No script generated yet.</h5>
+                                    <h3 class="h5 text-center text-muted py-5 mt-4">No script generated yet.</h3>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="output-pane" role="tabpanel">
                                 <div id="output-view" class="row">
-                                    <h5 class="text-center text-muted py-5 mt-4">Waiting for final render...</h5>
+                                    <h3 class="h5 text-center text-muted py-5 mt-4">Waiting for final render...</h3>
                                 </div>
                             </div>
                         </div>
@@ -259,14 +264,14 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Settings Modal -->
     <div class="modal fade" id="settingsModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg border-0">
                 <div class="modal-header text-bg-primary">
-                    <h5 class="modal-title fw-bold text-white">System Settings</h5>
+                    <h2 class="h5 modal-title fw-bold text-white">System Settings</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -449,8 +454,8 @@
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="badge bg-secondary">${seg.id}</span>
-                                <span class="badge bg-primary">${seg.duration_seconds}s</span>
+                                <span class="badge text-bg-secondary">${seg.id}</span>
+                                <span class="badge text-bg-primary">${seg.duration_seconds}s</span>
                             </div>
                             <p class="small mb-2">${seg.text}</p>
                             <hr>
@@ -469,7 +474,7 @@
 
             view.innerHTML = `
                 <div class="col-md-6 mb-4">
-                    <h6>Visual Production</h6>
+                    <h2 class="h6 fw-bold">Visual Production</h2>
                     <video controls class="w-100 rounded shadow">
                         <source src="/api/files/${manifest.media_files.vertical_720p}" type="video/mp4">
                     </video>
@@ -479,26 +484,26 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h6>Social Pack</h6>
+                    <h2 class="h6 fw-bold">Social Pack</h2>
                     <div class="accordion" id="metaAccordion">
                         <div class="accordion-item">
-                            <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#metaLI">LinkedIn</button></h2>
+                            <h3 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#metaLI">LinkedIn</button></h3>
                             <div id="metaLI" class="accordion-collapse collapse show"><div class="accordion-body small">${manifest.social_metadata.caption_linkedin}</div></div>
                         </div>
                         <div class="accordion-item">
-                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#metaTT">TikTok</button></h2>
+                            <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#metaTT">TikTok</button></h3>
                             <div id="metaTT" class="accordion-collapse collapse"><div class="accordion-body small">${manifest.social_metadata.caption_tiktok}</div></div>
                         </div>
                     </div>
                     <div class="mt-3">
-                        ${manifest.social_metadata.hashtags.map(h => `<span class="badge bg-light text-dark border me-1">#${h}</span>`).join('')}
+                        ${manifest.social_metadata.hashtags.map(h => `<span class="badge text-bg-light border me-1">#${h}</span>`).join('')}
                     </div>
                 </div>
             `;
 
             // Switch to output tab
             document.getElementById('output-tab').click();
-            document.getElementById('pipeline-status-badge').className = 'badge status-badge bg-success';
+            document.getElementById('pipeline-status-badge').className = 'badge status-badge text-bg-success mb-4';
             document.getElementById('pipeline-status-badge').innerText = 'COMPLETE';
         }
 
@@ -510,7 +515,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic })
             });
-            document.getElementById('pipeline-status-badge').className = 'badge status-badge bg-primary';
+            document.getElementById('pipeline-status-badge').className = 'badge status-badge text-bg-primary mb-4';
             document.getElementById('pipeline-status-badge').innerText = 'RUNNING';
         });
 
