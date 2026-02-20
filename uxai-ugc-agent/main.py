@@ -45,7 +45,7 @@ def login():
     if not password:
         return jsonify({"valid": True}) # No password set = valid
     
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     if data.get("password") == password:
         return jsonify({"valid": True})
     return jsonify({"valid": False}), 401
