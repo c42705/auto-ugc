@@ -1,0 +1,14 @@
+openai>=1.0.0
+requests
+praw
+flask
+flask-socketio
+flask-cors
+elevenlabs
+moviepy==1.0.3
+pillow
+psutil
+python-dotenv
+schedule
+httpx
+gevent

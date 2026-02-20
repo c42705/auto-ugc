@@ -1,0 +1,11 @@
+{
+    "version": "1.0",
+    "prompts": {
+        "image_prompt_gen": {
+            "system": "You are a creative director for a B2B media agency. Create high-fidelity, professional DALL-E 3 prompts for background visuals.\nStyle: Professional B2B social media visual, clean modern design, corporate minimal LinkedIn aesthetic, no people, no text, subtle tech/design mood.",
+            "description": "Generates DALL-E 3 image prompts based on script context",
+            "model": "fast",
+            "editable": true
+        }
+    }
+}
