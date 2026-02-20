@@ -7,167 +7,14 @@
     <title>UX·AI UGC Content Agent</title>
     <!-- Bootswatch Darkly Theme -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5/dist/darkly/bootstrap.min.css">
-    <style>
-        body {
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Access screen */
-        #login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bs-body-bg);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            display: flex;
-            overflow: hidden;
-        }
-
-        .glass-panel {
-            overflow-y: auto;
-            height: 100%;
-        }
-
-        .glass-panel.sidebar-left {
-            width: 320px;
-            background-color: var(--bs-body-tertiary);
-            border-right: 1px solid var(--bs-border-color);
-            padding: 2rem 1rem;
-        }
-
-        .glass-panel.main-area {
-            flex-grow: 1;
-            padding: 2rem;
-        }
-
-        .log-container {
-            font-family: var(--bs-font-monospace);
-            min-height: 400px;
-            max-height: 600px;
-            overflow-y: auto;
-            padding: 1rem;
-            background-color: var(--bs-tertiary-bg);
-            border-radius: var(--bs-border-radius);
-            border: var(--bs-border-width) solid var(--bs-border-color);
-        }
-
-        .log-line {
-            margin-bottom: 0.2rem;
-            font-size: 0.9rem;
-        }
-
-        .stepper-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            position: relative;
-        }
-
-        .stepper-number {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid var(--bs-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            font-weight: bold;
-            flex-shrink: 0;
-            color: var(--bs-secondary);
-        }
-
-        .stepper-item.running .stepper-number {
-            border-color: var(--bs-primary);
-            color: var(--bs-primary);
-            animation: pulse 1.5s infinite;
-        }
-
-        .stepper-item.done .stepper-number {
-            background-color: var(--bs-success);
-            border-color: var(--bs-success);
-            color: var(--bs-white);
-        }
-
-        .stepper-item.error .stepper-number {
-            background-color: var(--bs-danger);
-            border-color: var(--bs-danger);
-            color: var(--bs-white);
-        }
-
-        .stepper-item.active {
-            border: 1px solid var(--bs-primary);
-            border-radius: var(--bs-border-radius-lg);
-            padding: 0.5rem;
-            background: var(--bs-tertiary-bg);
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0.4);
-            }
-
-            70% {
-                transform: scale(1.05);
-                box-shadow: 0 0 0 10px rgba(var(--bs-primary-rgb), 0);
-            }
-
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0);
-            }
-        }
-
-        .pulse-danger {
-            animation: pulseDanger 1.5s infinite;
-        }
-
-        @keyframes pulseDanger {
-            0% {
-                box-shadow: 0 0 0 0 rgba(var(--bs-danger-rgb), 0.5);
-            }
-
-            70% {
-                box-shadow: 0 0 0 15px rgba(var(--bs-danger-rgb), 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(var(--bs-danger-rgb), 0);
-            }
-        }
-
-
-        .json-editor {
-            font-family: var(--bs-font-monospace);
-            font-size: 0.85rem;
-            height: 300px;
-            width: 100%;
-            background-color: var(--bs-tertiary-bg);
-            color: var(--bs-body-color);
-            border: var(--bs-border-width) solid var(--bs-border-color);
-            border-radius: var(--bs-border-radius);
-            padding: 10px;
-        }
-    </style>
 </head>
 
-<body>
+<body class="vh-100 overflow-hidden d-flex flex-column">
 
     <!-- Simple Password Overlay -->
-    <div id="login-overlay">
+    <div id="login-overlay"
+        class="position-fixed top-0 start-0 w-100 h-100 bg-body d-flex justify-content-center align-items-center"
+        style="z-index: 9999;">
         <div class="card shadow-lg border-0" style="max-width: 400px; width: 100%;">
             <div class="card-header text-bg-primary py-3">
                 <h1 class="h5 mb-0 fw-bold">UX·AI UGC access</h1>
@@ -191,7 +38,7 @@
         <div class="container-fluid">
             <a class="navbar-brand fw-bold ms-2 text-uppercase tracking-wide" href="#">UX·AI UGC Agent</a>
             <div class="d-flex align-items-center me-2">
-                <div id="pipeline-status-badge" class="badge status-badge text-bg-secondary me-3 my-auto">IDLE</div>
+                <div id="pipeline-status-badge" class="badge text-bg-secondary me-3 my-auto fs-6 px-3 py-2">IDLE</div>
                 <div class="d-flex align-items-center me-3" style="width: 150px;">
                     <span class="small text-light text-uppercase fw-bold me-2" style="font-size: 0.7rem;">RAM</span>
                     <div class="progress shadow-sm flex-grow-1"
@@ -208,10 +55,10 @@
         </div>
     </nav>
 
-    <main class="main-content">
+    <main class="flex-grow-1 d-flex overflow-hidden">
 
         <!-- Vertical Left Sidebar for Pipeline Progress -->
-        <div class="glass-panel sidebar-left shadow-sm">
+        <div class="h-100 overflow-auto bg-body-tertiary border-end p-4 shadow-sm" style="width: 320px;">
             <h2 class="h6 text-uppercase fw-bold mb-3 text-muted">Pipeline Progress</h2>
             <div id="stepper" class="d-flex flex-column gap-1">
                 <!-- Steps dynamically inserted here -->
@@ -219,7 +66,7 @@
         </div>
 
         <!-- Main Content Area -->
-        <div class="glass-panel main-area">
+        <div class="h-100 overflow-auto flex-grow-1 p-4">
 
             <div class="card shadow-sm border-0 mb-4 bg-body-tertiary">
                 <div class="card-body p-4 d-flex gap-3 align-items-end">
@@ -230,8 +77,7 @@
                             placeholder="e.g. Fintech UX gaps...">
                     </div>
                     <button id="btn-run" class="btn btn-success fw-bold px-4 py-2 text-uppercase"
-                        style="min-width: 180px;">▶
-                        RUN PIPELINE</button>
+                        style="min-width: 180px;">▶ RUN PIPELINE</button>
                 </div>
             </div>
 
@@ -261,7 +107,8 @@
                                     class="btn btn-sm btn-outline-secondary text-uppercase flex-shrink-0">Clear
                                     Log</button>
                             </div>
-                            <div id="log-view" class="log-container shadow-inner"></div>
+                            <div id="log-view" class="font-monospace overflow-auto p-3 bg-body rounded border"
+                                style="min-height: 400px; max-height: 600px;"></div>
                         </div>
                         <div class="tab-pane fade" id="script-pane" role="tabpanel">
                             <div id="qa-summary" class="mb-3"></div>
@@ -298,7 +145,8 @@
                         style="width: 100%"></div>
                 </div>
                 <div class="modal-body bg-body-tertiary">
-                    <textarea id="review-json" class="json-editor mb-3"></textarea>
+                    <textarea id="review-json" class="font-monospace bg-body text-body border rounded p-2 mb-3 w-100"
+                        style="font-size: 0.85rem; height: 300px;"></textarea>
                     <div class="d-flex justify-content-end gap-2">
                         <button id="btn-submit-override" class="btn btn-success fw-bold">✅ Submit My Changes</button>
                         <button id="btn-continue" class="btn btn-secondary fw-bold">⏭ Continue Now</button>
@@ -426,13 +274,15 @@
         const stepperEl = document.getElementById('stepper');
         steps.forEach((step, idx) => {
             const el = document.createElement('div');
+            el.id = `step-${step}`;
+            el.className = 'd-flex align-items-center mb-3 p-2 rounded';
             el.innerHTML = `
-                <div id="step-${step}" class="stepper-item">
-                    <div class="stepper-number">${idx + 1}</div>
-                    <div>
-                        <div class="fw-bold" style="font-size: 0.8rem;">${stepLabels[step]}</div>
-                        <small class="step-status text-muted" style="font-size: 0.7rem;">Pending</small>
-                    </div>
+                <div class="d-flex align-items-center justify-content-center rounded-circle border border-2 border-secondary text-secondary fw-bold me-3 flex-shrink-0 stepper-number" style="width: 30px; height: 30px;">
+                    ${idx + 1}
+                </div>
+                <div>
+                    <div class="fw-bold" style="font-size: 0.8rem;">${stepLabels[step]}</div>
+                    <small class="step-status text-muted" style="font-size: 0.7rem;">Pending</small>
                 </div>
             `;
             stepperEl.appendChild(el);
@@ -470,14 +320,14 @@
             const btn = document.getElementById('btn-run');
             const badge = document.getElementById('pipeline-status-badge');
             if (running) {
-                btn.className = "btn btn-danger fw-bold px-4 py-2 pulse-danger text-uppercase";
+                btn.className = "btn btn-danger fw-bold px-4 py-2 text-uppercase";
                 btn.innerHTML = "⏹ CANCEL PIPELINE";
-                badge.className = 'badge status-badge text-bg-primary me-3 my-auto';
+                badge.className = 'badge text-bg-primary me-3 my-auto fs-6 px-3 py-2';
                 badge.innerText = 'RUNNING';
             } else {
                 btn.className = "btn btn-success fw-bold px-4 py-2 text-uppercase";
                 btn.innerHTML = "▶ RUN PIPELINE";
-                badge.className = 'badge status-badge text-bg-secondary me-3 my-auto';
+                badge.className = 'badge text-bg-secondary me-3 my-auto fs-6 px-3 py-2';
                 badge.innerText = 'IDLE';
             }
         }
@@ -490,11 +340,24 @@
             const el = document.getElementById(`step-${step}`);
             if (!el) return;
 
-            el.classList.remove('running', 'done', 'error', 'active');
-            el.classList.add(status);
-            if (status === 'running') el.classList.add('active');
-
+            const numberEl = el.querySelector('.stepper-number');
             const statusEl = el.querySelector('.step-status');
+
+            // Reset classes
+            el.className = 'd-flex align-items-center mb-3 p-2 rounded';
+            numberEl.className = 'd-flex align-items-center justify-content-center rounded-circle border border-2 fw-bold me-3 flex-shrink-0 stepper-number';
+
+            if (status === 'running') {
+                el.classList.add('border', 'border-primary', 'bg-body-secondary');
+                numberEl.classList.add('border-primary', 'text-primary');
+            } else if (status === 'done') {
+                numberEl.classList.add('bg-success', 'border-success', 'text-white');
+            } else if (status === 'error') {
+                numberEl.classList.add('bg-danger', 'border-danger', 'text-white');
+            } else {
+                numberEl.classList.add('border-secondary', 'text-secondary');
+            }
+
             statusEl.innerText = status.charAt(0).toUpperCase() + status.slice(1);
 
             if (status === 'done' && step === 'scripting') {
@@ -506,7 +369,8 @@
             const logView = document.getElementById('log-view');
             const line = document.createElement('div');
             const levelColors = { 'INFO': 'text-body', 'SUCCESS': 'text-success fw-bold', 'WARNING': 'text-warning fw-bold', 'ERROR': 'text-danger fw-bold', 'AGENT': 'text-info fw-bold' };
-            line.className = `log-line mb-1 ${levelColors[data.level] || 'text-body'}`;
+            line.className = `mb-1 ${levelColors[data.level] || 'text-body'}`;
+            line.style.fontSize = '0.9rem';
             const timestamp = new Date().toLocaleTimeString();
             line.innerText = `[${timestamp}] [${data.level}] ${data.msg}`;
             logView.appendChild(line);
@@ -575,7 +439,7 @@
                             <p class="small mb-2">${seg.text}</p>
                             <hr>
                             <div class="small text-muted"><strong>Screen:</strong> ${seg.on_screen_text}</div>
-                            <div class="small text-muted italic"><strong>Mood:</strong> ${seg.emotion_cue}</div>
+                            <div class="small text-muted text-info"><strong>Mood:</strong> ${seg.emotion_cue}</div>
                         </div>
                     </div>
                 `;
@@ -618,7 +482,7 @@
 
             // Switch to output tab
             document.getElementById('output-tab').click();
-            document.getElementById('pipeline-status-badge').className = 'badge status-badge text-bg-success me-3 my-auto';
+            document.getElementById('pipeline-status-badge').className = 'badge text-bg-success me-3 my-auto fs-6 px-3 py-2';
             document.getElementById('pipeline-status-badge').innerText = 'COMPLETE';
             setIdleState();
         }
