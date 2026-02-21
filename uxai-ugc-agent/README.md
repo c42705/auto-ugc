@@ -13,7 +13,7 @@ A multi-agent automation system designed to research, write, and produce high-im
 
 1. **Clone & Setup Environment**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/c42705/auto-ugc
    cd uxai-ugc-agent
    python -m venv venv
    source venv/bin/activate
@@ -24,7 +24,7 @@ A multi-agent automation system designed to research, write, and produce high-im
    Copy `.env.example` to `.env` and fill in your keys:
    ```bash
    cp .env.example .env
-   # Edit .env with your favorite editor
+   # Edit .env with your favorite editor, add all your API keys and credentials
    ```
 
 3. **Launch the Dashboard**:

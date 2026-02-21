@@ -50,6 +50,13 @@ class Orchestrator:
             "avatar_clips", "images", "assembly", "qa_video", 
             "metadata", "finalize"
         ]
+        
+        # Per-step timing and status tracking
+        # Each entry: {status: pending|running|done|error, start_ts: float, end_ts: float, duration_s: float}
+        self.step_data: Dict[str, Dict[str, Any]] = {
+            s: {"status": "pending", "start_ts": None, "end_ts": None, "duration_s": None}
+            for s in self.steps_list
+        }
 
     def _create_session(self) -> str:
         """Create /output/YYYY-MM-DD-HHMMSS/ folder and return session_id"""
@@ -67,7 +74,18 @@ class Orchestrator:
         self.current_step = step_name
         self.log.info(f">>> Executing step: {step_name}", context="Orchestrator")
         
-        self._emit("step_start", {"step": step_name, "session_id": self.session_id})
+        # Record start time
+        t_start = time.time()
+        self.step_data[step_name]["status"] = "running"
+        self.step_data[step_name]["start_ts"] = t_start
+        self.step_data[step_name]["end_ts"] = None
+        self.step_data[step_name]["duration_s"] = None
+        
+        self._emit("step_start", {
+            "step": step_name,
+            "session_id": self.session_id,
+            "start_ts": t_start
+        })
         
         # Memory Check
         mem_status = self.memory_guard.check(context=step_name)
@@ -76,10 +94,24 @@ class Orchestrator:
         try:
             result = func(*args, **kwargs)
             self.results[step_name] = result
-            self._emit("step_complete", {"step": step_name, "result_summary": str(result)[:200]})
+            t_end = time.time()
+            duration = round(t_end - t_start, 1)
+            self.step_data[step_name]["status"] = "done"
+            self.step_data[step_name]["end_ts"] = t_end
+            self.step_data[step_name]["duration_s"] = duration
+            self._emit("step_complete", {
+                "step": step_name,
+                "result_summary": str(result)[:200],
+                "duration_s": duration,
+                "end_ts": t_end
+            })
             return result
         except Exception as e:
             self.status = "failed"
+            t_end = time.time()
+            self.step_data[step_name]["status"] = "error"
+            self.step_data[step_name]["end_ts"] = t_end
+            self.step_data[step_name]["duration_s"] = round(t_end - t_start, 1)
             self.log.error(f"Step {step_name} failed: {e}", context="Orchestrator")
             self._emit("step_error", {"step": step_name, "error": str(e)})
             self.notifier.step_error(step_name, str(e))
@@ -90,6 +122,13 @@ class Orchestrator:
         timeout = config.HUMAN_REVIEW_TIMEOUT_SECONDS
         self.log.warning(f"WAITING FOR HUMAN REVIEW: {step} (Timeout: {timeout}s)", context="Orchestrator")
         
+        t_start = time.time()
+        self.step_data[step]["status"] = "review"
+        self.step_data[step]["start_ts"] = t_start
+        self.step_data[step]["end_ts"] = None
+        self.step_data[step]["duration_s"] = None
+        self.current_step = step
+        
         self.pending_review = {
             "step": step,
             "data": data,
@@ -99,7 +138,8 @@ class Orchestrator:
         self._emit("review_window_open", {
             "step": step,
             "data": data,
-            "timeout": timeout
+            "timeout": timeout,
+            "start_ts": t_start
         })
         
         self.notifier.review_window_open(step, timeout)
@@ -108,14 +148,21 @@ class Orchestrator:
         self.review_event.clear()
         event_is_set = self.review_event.wait(timeout=timeout)
         
+        t_end = time.time()
+        duration = round(t_end - t_start, 1)
+        self.step_data[step]["end_ts"] = t_end
+        self.step_data[step]["duration_s"] = duration
+        
         if event_is_set:
             override = self.overrides.get(step)
             self.log.success(f"Human review received for {step}", context="Orchestrator")
+            self.step_data[step]["status"] = "done"
             self.pending_review = None
             # Return merged data or override data
             return override if override else data
         else:
             self.log.info(f"Review window timeout for {step}. Auto-continuing with original data.", context="Orchestrator")
+            self.step_data[step]["status"] = "done"
             self._emit("review_window_timeout", {"step": step})
             self.pending_review = None
             return data
@@ -195,13 +242,33 @@ class Orchestrator:
 
     def get_status(self) -> Dict[str, Any]:
         """Returns the current status and progress of the pipeline."""
-        elapsed = time.time() - self.start_time if self.start_time else 0
+        now = time.time()
+        elapsed = now - self.start_time if self.start_time else 0
         current_idx = self.steps_list.index(self.current_step) if self.current_step in self.steps_list else 0
-        progress = (current_idx / len(self.steps_list)) * 100
+        
+        # Count completed steps for accurate progress
+        done_count = sum(1 for s in self.steps_list if self.step_data[s]["status"] in ("done", "error"))
+        progress = (done_count / len(self.steps_list)) * 100
         
         timeout_rem = None
         if self.pending_review:
-            timeout_rem = max(0, self.pending_review["timeout_at"] - time.time())
+            timeout_rem = max(0, self.pending_review["timeout_at"] - now)
+
+        # Build per-step snapshot for UI reconstruction
+        steps_snapshot = {}
+        for s in self.steps_list:
+            sd = self.step_data[s]
+            snap = {"status": sd["status"]}
+            if sd["start_ts"]:
+                snap["start_ts"] = sd["start_ts"]
+            if sd["end_ts"]:
+                snap["end_ts"] = sd["end_ts"]
+            if sd["duration_s"] is not None:
+                snap["duration_s"] = sd["duration_s"]
+            elif sd["status"] == "running" and sd["start_ts"]:
+                # Live duration for active step
+                snap["duration_s"] = round(now - sd["start_ts"], 1)
+            steps_snapshot[s] = snap
 
         return {
             "session_id": self.session_id,
@@ -216,7 +283,8 @@ class Orchestrator:
                 "step": self.pending_review["step"],
                 "timeout_remaining": round(timeout_rem, 1)
             } if self.pending_review else None,
-            "output_path": self.session_path
+            "output_path": self.session_path,
+            "steps": steps_snapshot
         }
 
     def _write_manifest(self) -> str:

@@ -35,6 +35,7 @@ class MediaGeneratorAgent:
         self.openai_client = OpenAI(api_key=config.OPENAI_API_KEY)
         
         self._check_ffmpeg()
+        self._validate_elevenlabs()
 
     def generate_voiceover(self, script_segments: List[Dict[str, Any]], session_path: str) -> List[str]:
         """
@@ -62,13 +63,21 @@ class MediaGeneratorAgent:
                 
                 with open(output_path, "wb") as f:
                     for chunk in audio_it:
-                        f.write(chunk)
+                        if chunk:
+                            f.write(chunk)
                 
                 audio_paths.append(output_path)
-                self.log.info(f"Generated audio for segment {i}", context="MediaGeneratorAgent")
+                self.log.info(f"Generated audio for segment {i}: {output_path}", context="MediaGeneratorAgent")
             except Exception as e:
-                self.log.error(f"Failed to generate audio for segment {i}: {e}", context="MediaGeneratorAgent")
-                raise
+                # Surface a clean error: status_code + body, not headers dump
+                status = getattr(e, 'status_code', None)
+                body = getattr(e, 'body', None)
+                if status and body:
+                    clean = f"ElevenLabs API error {status}: {body}"
+                else:
+                    clean = str(e)
+                self.log.error(f"Failed to generate audio for segment {i}: {clean}", context="MediaGeneratorAgent")
+                raise RuntimeError(clean) from e
 
         self.notifier.send(title="Audio Complete", message=f"Generated {len(audio_paths)} voiceover segments.", tags=["speaker"])
         return audio_paths
@@ -319,3 +328,31 @@ class MediaGeneratorAgent:
         except Exception:
             self.log.error("FFmpeg or FFprobe not found! Media assembly will fail.", context="MediaGeneratorAgent")
             return False
+
+    def _validate_elevenlabs(self):
+        """
+        Preflights the ElevenLabs API key and voice ID so failures surface
+        early with actionable messages instead of cryptic 404s mid-pipeline.
+        """
+        if not config.ELEVENLABS_API_KEY:
+            self.log.warning("ELEVENLABS_API_KEY not set. Voiceover step will fail.", context="MediaGeneratorAgent")
+            return
+        try:
+            voices_page = self.el_client.voices.get_all()
+            voice_ids = [v.voice_id for v in voices_page.voices]
+            if config.ELEVENLABS_VOICE_ID not in voice_ids:
+                available = ", ".join(voice_ids[:5])
+                self.log.error(
+                    f"ELEVENLABS_VOICE_ID '{config.ELEVENLABS_VOICE_ID}' not found in your account. "
+                    f"Available voice IDs (first 5): {available}. "
+                    f"Update ELEVENLABS_VOICE_ID in .env.",
+                    context="MediaGeneratorAgent"
+                )
+            else:
+                self.log.info(f"ElevenLabs voice validated: {config.ELEVENLABS_VOICE_ID}", context="MediaGeneratorAgent")
+        except Exception as e:
+            status = getattr(e, 'status_code', None)
+            if status == 401:
+                self.log.error("ElevenLabs API key is invalid (401). Check ELEVENLABS_API_KEY in .env.", context="MediaGeneratorAgent")
+            else:
+                self.log.warning(f"Could not validate ElevenLabs voice: {e}", context="MediaGeneratorAgent")

@@ -51,6 +51,7 @@ class LLMClient:
                 max_tokens=max_tokens,
                 extra_body={"response_format": {"type": "json_object"}} if response_format == "json" else None
             )
+            log.info(f"Using model: {model_name}", context="LLMClient")
             return completion
 
         try:
@@ -78,10 +79,41 @@ class LLMClient:
     def complete_json(self, system: str, user: str, model: str = "main") -> dict:
         """
         Calls complete() with response_format="json", parses and returns dict.
+        Uses a higher max_tokens to avoid truncation of large JSON responses from
+        free-tier models that have low default output limits.
         """
-        content = self.complete(system, user, model=model, response_format="json")
+        content = self.complete(
+            system, user,
+            model=model,
+            response_format="json",
+            max_tokens=4096  # override default 2000 to avoid truncated JSON
+        )
         try:
             return json.loads(content)
         except json.JSONDecodeError as e:
-            log.error(f"Failed to parse JSON response: {e}\nContent: {content}", context="LLMClient")
+            log.warning(f"JSON parse failed ({e}). Attempting rescue of truncated response...", context="LLMClient")
+            # Rescue: try to find the last valid closing brace/bracket and parse up to there
+            rescued = _rescue_truncated_json(content)
+            if rescued is not None:
+                log.warning("Rescued partial JSON from truncated LLM response.", context="LLMClient")
+                return rescued
+            log.error(f"Failed to parse JSON response (unrecoverable):\n{content[:500]}...", context="LLMClient")
             raise ValueError(f"Invalid JSON response from LLM: {content}") from e
+
+
+def _rescue_truncated_json(content: str) -> "dict | None":
+    """
+    Try to close a truncated JSON string by finding the last complete
+    top-level object or array and parsing just that portion.
+    """
+    import json
+    # Try progressively shorter substrings ending at }, ] to find valid JSON
+    for end_char in ('}', ']'):
+        idx = content.rfind(end_char)
+        while idx > 0:
+            candidate = content[:idx + 1]
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                idx = content.rfind(end_char, 0, idx)
+    return None

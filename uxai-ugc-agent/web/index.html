@@ -51,7 +51,7 @@
                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
                     </div>
                 </div>
-                <button class="btn btn-outline-light btn-sm fw-bold text-uppercase" data-bs-toggle="modal"
+                <button class="btn btn-sm fw-bold text-uppercase" data-bs-toggle="modal"
                     data-bs-target="#settingsModal">
                     ⚙ Settings
                 </button>
@@ -204,7 +204,13 @@
         const socket = io();
         let sessionToken = sessionStorage.getItem('ui_token');
         let isRunning = false;
-        let reviewModalInstance = null;
+        let authReady = false;  // true once we know the token is valid
+
+        // Initialize Bootstrap modal components immediately — the DOM is ready
+        // since this script is at the bottom of <body>. DOMContentLoaded may
+        // not fire until AFTER async socket events, so we avoid that race.
+        const reviewModalInstance = new bootstrap.Modal(document.getElementById('reviewModal'));
+        const settingsModalInstance = new bootstrap.Modal(document.getElementById('settingsModal'));
 
         // API Request wrapper to inject header
         async function apiCall(url, options = {}) {
@@ -242,6 +248,8 @@
                     sessionStorage.setItem('ui_token', pass);
                     document.getElementById('login-overlay').classList.remove('d-flex');
                     document.getElementById('login-overlay').classList.add('d-none');
+                    authReady = true;
+                    syncServerState(); // restore pipeline state right after login
                 } else {
                     console.error("[LOGIN] Login failed: Password incorrect or server denied access. HTTP Status:", res.status);
                     errorDiv.innerText = "Incorrect password.";
@@ -273,6 +281,8 @@
                     sessionToken = null;
                     document.getElementById('login-overlay').classList.remove('d-flex');
                     document.getElementById('login-overlay').classList.add('d-none');
+                    authReady = true;
+                    syncServerState(); // restore state when auth not required
                     return;
                 }
 
@@ -291,6 +301,8 @@
                         console.log("[AUTH_INIT] Cached token is valid. Hiding overlay.");
                         document.getElementById('login-overlay').classList.remove('d-flex');
                         document.getElementById('login-overlay').classList.add('d-none');
+                        authReady = true;
+                        syncServerState(); // restore state with cached token
                     } else {
                         console.warn("[AUTH_INIT] Cached token invalid or server rejected. Clearing token.");
                         sessionToken = null;
@@ -327,6 +339,10 @@
             "finalize": "Packaging"
         };
 
+        // Per-step live timing state
+        const stepTimers = {};   // step -> setInterval id for live ticking
+        const stepStartTs = {};  // step -> server epoch (seconds)
+
         let reviewTimer = null;
         let reviewStep = null;
 
@@ -340,29 +356,79 @@
                 <div class="d-flex align-items-center justify-content-center rounded-circle border border-2 border-secondary text-secondary fw-bold me-3 flex-shrink-0 stepper-number" style="width: 30px; height: 30px;">
                     ${idx + 1}
                 </div>
-                <div>
+                <div class="flex-grow-1">
                     <div class="fw-bold" style="font-size: 0.8rem;">${stepLabels[step]}</div>
                     <small class="step-status text-muted" style="font-size: 0.7rem;">Pending</small>
                 </div>
+                <div class="step-elapsed text-muted ms-2" style="font-size: 0.7rem; min-width: 42px; text-align: right;"></div>
             `;
             stepperEl.appendChild(el);
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            reviewModalInstance = new bootstrap.Modal(document.getElementById('reviewModal'));
+        // reviewModalInstance already initialized eagerly above.
+
+        // ─── Helper: format elapsed seconds ────────────────────────────────────
+        function fmtElapsed(secs) {
+            if (secs === null || secs === undefined) return '';
+            const s = Math.round(secs);
+            if (s < 60) return `${s}s`;
+            const m = Math.floor(s / 60);
+            const rem = s % 60;
+            return `${m}m ${rem}s`;
+        }
+
+        // ─── Start / stop live elapsed timer for a step ────────────────────────
+        function startLiveTimer(step, startTs) {
+            stopLiveTimer(step);
+            stepStartTs[step] = startTs;
+            const elapsedEl = document.querySelector(`#step-${step} .step-elapsed`);
+            if (!elapsedEl) return;
+
+            function tick() {
+                const elapsed = (Date.now() / 1000) - stepStartTs[step];
+                elapsedEl.textContent = fmtElapsed(elapsed);
+            }
+            tick();
+            stepTimers[step] = setInterval(tick, 1000);
+        }
+
+        function stopLiveTimer(step) {
+            if (stepTimers[step]) {
+                clearInterval(stepTimers[step]);
+                delete stepTimers[step];
+            }
+            delete stepStartTs[step];
+        }
+
+        // ─── Socket Listeners ──────────────────────────────────────────────────
+        socket.on('step_start', (data) => {
+            updateStep(data.step, 'running');
+            if (data.start_ts) startLiveTimer(data.step, data.start_ts);
         });
 
-        // Socket Listeners
-        socket.on('step_start', (data) => updateStep(data.step, 'running'));
-        socket.on('step_complete', (data) => updateStep(data.step, 'done', data));
+        socket.on('step_complete', (data) => {
+            stopLiveTimer(data.step);
+            updateStep(data.step, 'done', data);
+            // Show final duration
+            const elapsedEl = document.querySelector(`#step-${data.step} .step-elapsed`);
+            if (elapsedEl && data.duration_s != null) {
+                elapsedEl.textContent = fmtElapsed(data.duration_s);
+            }
+        });
+
         socket.on('step_error', (data) => {
+            stopLiveTimer(data.step);
             updateStep(data.step, 'error', data);
             setIdleState();
         });
+
         socket.on('pipeline_log', (data) => appendLog(data));
         socket.on('ram_update', (data) => updateRamBar(data));
-
-        socket.on('review_window_open', (data) => showReviewPanel(data));
+        socket.on('review_window_open', (data) => {
+            updateStep(data.step, 'review');
+            if (data.start_ts) startLiveTimer(data.step, data.start_ts);
+            showReviewPanel(data);
+        });
         socket.on('review_window_timeout', () => hideReviewPanel());
         socket.on('override_received', () => {
             hideReviewPanel();
@@ -373,6 +439,141 @@
             showOutputPanel(data);
             setIdleState();
         });
+
+        // ─── Socket reconnect → re-sync state from server ─────────────────────
+        // We use 'connect' for ALL connections (initial + reconnects).
+        // Guard with authReady so we don't call syncServerState before auth.
+        socket.on('connect', () => {
+            if (authReady) {
+                appendLog({ level: 'INFO', msg: '🔄 Reconnected — restoring pipeline state...' });
+                syncServerState();
+            }
+        });
+
+        socket.on('disconnect', () => {
+            const logView = document.getElementById('log-view');
+            if (logView) {
+                const line = document.createElement('div');
+                line.className = 'mb-1 text-warning fw-bold';
+                line.style.fontSize = '0.9rem';
+                line.innerText = `[${new Date().toLocaleTimeString()}] [WARN] Socket disconnected — will auto-reconnect.`;
+                logView.appendChild(line);
+                logView.scrollTop = logView.scrollHeight;
+            }
+        });
+
+        // ─── Restore full pipeline state from /api/status ──────────────────────
+        /**
+         * Called on page load (after auth) and on socket reconnect.
+         * Reconstructs the stepper, running timers, review panel, and badge
+         * to match whatever the server reports.
+         */
+        async function syncServerState(silent = false) {
+            let r;
+            try {
+                r = await apiCall('/api/status');
+            } catch (netErr) {
+                appendLog({ level: 'WARNING', msg: `State sync failed (network error): ${netErr.message}` });
+                return;
+            }
+
+            if (!r.ok) {
+                if (r.status === 401) {
+                    // Auth failed — token may have expired
+                    appendLog({ level: 'WARNING', msg: 'State sync: auth rejected (401). Please refresh and log in again.' });
+                } else {
+                    appendLog({ level: 'WARNING', msg: `State sync: server error ${r.status}` });
+                }
+                return;
+            }
+
+            let data;
+            try {
+                data = await r.json();
+            } catch (parseErr) {
+                appendLog({ level: 'WARNING', msg: `State sync: invalid JSON response.` });
+                return;
+            }
+
+            // Update RAM bar
+            if (data.ram_percent != null) updateRamBar({ percent: data.ram_percent });
+
+            // Update run button + badge
+            const badge = document.getElementById('pipeline-status-badge');
+            if (data.status === 'running') {
+                toggleRunButton(true);
+            } else if (data.status === 'completed') {
+                toggleRunButton(false);
+                badge.className = 'badge text-bg-success me-3 my-auto fs-6 px-3 py-2';
+                badge.innerText = 'COMPLETE';
+            } else if (data.status === 'failed') {
+                toggleRunButton(false);
+                badge.className = 'badge text-bg-danger me-3 my-auto fs-6 px-3 py-2';
+                badge.innerText = 'FAILED';
+            } else {
+                // idle — nothing to restore
+                return;
+            }
+
+            if (!data.steps) {
+                appendLog({ level: 'WARNING', msg: 'State sync: server is running but step data unavailable. Restart the server to enable step tracking.' });
+                return;
+            }
+
+            // Stop all running live timers first (clean slate)
+            steps.forEach(s => stopLiveTimer(s));
+
+            let restored = 0;
+            // Reconstruct each step
+            steps.forEach(step => {
+                const snap = data.steps[step];
+                if (!snap || snap.status === 'pending') return;
+
+                const { status, start_ts, duration_s } = snap;
+                const elapsedEl = document.querySelector(`#step-${step} .step-elapsed`);
+
+                if (status === 'running') {
+                    updateStep(step, 'running');
+                    if (start_ts) startLiveTimer(step, start_ts);
+                    restored++;
+                } else if (status === 'review') {
+                    updateStep(step, 'review');
+                    if (start_ts) startLiveTimer(step, start_ts);
+                    restored++;
+                } else if (status === 'done') {
+                    updateStep(step, 'done');
+                    if (elapsedEl && duration_s != null) elapsedEl.textContent = fmtElapsed(duration_s);
+                    restored++;
+                } else if (status === 'error') {
+                    updateStep(step, 'error');
+                    if (elapsedEl && duration_s != null) elapsedEl.textContent = fmtElapsed(duration_s);
+                    restored++;
+                }
+            });
+
+            // Restore review modal if pending — but ONLY if it isn't already open.
+            // Calling showReviewPanel() while the user is editing would wipe their text.
+            if (data.pending_review) {
+                const modalEl = document.getElementById('reviewModal');
+                const isAlreadyOpen = modalEl && modalEl.classList.contains('show');
+                if (!isAlreadyOpen) {
+                    const pr = data.pending_review;
+                    showReviewPanel({
+                        step: pr.step,
+                        data: {},
+                        timeout: Math.max(1, pr.timeout_remaining)
+                    });
+                }
+                // If already open: leave it alone — the user may be editing the textarea.
+            }
+
+            if (!silent) {
+                appendLog({
+                    level: 'SUCCESS',
+                    msg: `✅ State restored — ${restored} steps recovered, pipeline ${data.status}, ${fmtElapsed(data.elapsed_seconds)} elapsed.`
+                });
+            }
+        }
 
         // Core Functions
         function toggleRunButton(running) {
@@ -387,8 +588,11 @@
             } else {
                 btn.className = "btn btn-success fw-bold px-4 py-2 text-uppercase";
                 btn.innerHTML = "▶ RUN PIPELINE";
-                badge.className = 'badge text-bg-secondary me-3 my-auto fs-6 px-3 py-2';
-                badge.innerText = 'IDLE';
+                // Only reset badge to IDLE if it wasn't already set to COMPLETE/FAILED
+                if (!['COMPLETE', 'FAILED'].includes(badge.innerText)) {
+                    badge.className = 'badge text-bg-secondary me-3 my-auto fs-6 px-3 py-2';
+                    badge.innerText = 'IDLE';
+                }
             }
         }
 
@@ -410,18 +614,24 @@
             if (status === 'running') {
                 el.classList.add('border', 'border-primary', 'bg-body-secondary');
                 numberEl.classList.add('border-primary', 'text-primary');
+                statusEl.innerHTML = '<span class="spinner-grow spinner-grow-sm me-1" aria-hidden="true"></span> Running...';
+            } else if (status === 'review') {
+                el.classList.add('border', 'border-warning', 'bg-body-secondary');
+                numberEl.classList.add('border-warning', 'text-warning');
+                statusEl.innerHTML = '⏳ Awaiting Review';
             } else if (status === 'done') {
                 numberEl.classList.add('bg-success', 'border-success', 'text-white');
+                statusEl.innerHTML = '✓ Done';
             } else if (status === 'error') {
                 numberEl.classList.add('bg-danger', 'border-danger', 'text-white');
+                statusEl.innerHTML = '✗ Error';
             } else {
                 numberEl.classList.add('border-secondary', 'text-secondary');
+                statusEl.innerHTML = 'Pending';
             }
 
-            statusEl.innerText = status.charAt(0).toUpperCase() + status.slice(1);
-
             if (status === 'done' && step === 'scripting') {
-                renderScript(data.result);
+                renderScript(data && data.result);
             }
         }
 
@@ -595,8 +805,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings)
             }).then(() => {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
-                modal.hide();
+                settingsModalInstance.hide();
             });
         });
 
@@ -608,22 +817,15 @@
             document.getElementById('log-view').innerHTML = '';
         });
 
-        // Periodic Status Update
+        // Periodic Status Update — full state reconciliation every 5s.
+        // This is the safety net: even if socket events were missed, the stepper
+        // will converge to the correct state within one poll cycle.
         setInterval(() => {
-            if (!sessionToken) return; // Don't ping if not logged in
-            apiCall('/api/status').then(r => {
-                if (!r.ok) return;
-                return r.json();
-            }).then(data => {
-                if (!data) return;
-                updateRamBar({ percent: data.ram_percent });
-                if (data.status === 'running') {
-                    toggleRunButton(true);
-                } else {
-                    if (isRunning) toggleRunButton(false);
-                }
-            }).catch(() => { });
+            if (!authReady) return; // Don't poll before auth is confirmed
+            syncServerState(true).catch(() => { }); // silent=true: no log spam every 5s
         }, 5000);
+
+        // (syncServerState is called explicitly from login handlers and socket 'connect' event)
     </script>
 </body>
 
