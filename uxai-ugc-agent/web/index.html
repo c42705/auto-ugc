@@ -16,7 +16,8 @@
         class="position-fixed top-0 start-0 w-100 h-100 bg-body d-flex justify-content-center align-items-center"
         style="z-index: 9999;">
         <div class="card shadow-lg border-0" style="max-width: 400px; width: 100%;">
-            <div class="card-header text-bg-primary py-3">
+            <div class="card-header text-bg-primary py-3 text-center">
+                <img src="/static/logo-light.png" alt="UX·AI Logo" class="mb-3 mt-1" style="max-height: 50px;">
                 <h1 class="h5 mb-0 fw-bold">UX·AI UGC access</h1>
             </div>
             <div class="card-body p-4">
@@ -212,17 +213,37 @@
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const pass = document.getElementById('ui-password').value;
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: pass })
-            });
-            if (res.ok) {
-                sessionToken = pass;
-                sessionStorage.setItem('ui_token', pass);
-                document.getElementById('login-overlay').style.display = 'none';
-            } else {
-                document.getElementById('login-error').classList.remove('d-none');
+            const btn = e.target.querySelector('button[type="submit"]');
+            const errorDiv = document.getElementById('login-error');
+            const ogText = btn.innerHTML;
+
+            errorDiv.classList.add('d-none');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span><span role="status">Unlocking...</span>';
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pass })
+                });
+
+                if (res.ok) {
+                    sessionToken = pass;
+                    sessionStorage.setItem('ui_token', pass);
+                    document.getElementById('login-overlay').style.display = 'none';
+                } else {
+                    console.error("Login failed: Password incorrect or server denied access. HTTP Status:", res.status);
+                    errorDiv.innerText = "Incorrect password.";
+                    errorDiv.classList.remove('d-none');
+                }
+            } catch (err) {
+                console.error("Login request failed due to a network or application error:", err);
+                errorDiv.innerText = "Connection error. Check console.";
+                errorDiv.classList.remove('d-none');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = ogText;
             }
         });
 
