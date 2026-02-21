@@ -33,6 +33,7 @@ def check_auth():
     if password and request.path.startswith("/api/") and request.path not in ["/api/login", "/api/auth_config"]:
         client_pwd = request.headers.get("X-UI-Password")
         if client_pwd != password:
+            log.warning(f"[AUTH] Failed auth on {request.path} from client IP: {request.remote_addr}")
             return jsonify({"error": "Unauthorized"}), 401
 
 @app.after_request
@@ -49,17 +50,24 @@ def index():
 @app.route("/api/auth_config", methods=["GET"])
 def auth_config():
     password = os.getenv("UI_PASSWORD")
+    log.info(f"[AUTH_CONFIG] Request received. UI_PASSWORD is set: {bool(password)}")
     return jsonify({"auth_required": bool(password)})
 
 @app.route("/api/login", methods=["POST"])
 def login():
     password = os.getenv("UI_PASSWORD")
+    log.info("[LOGIN API] Request received.")
     if not password:
+        log.info("[LOGIN API] No UI_PASSWORD set in backend. Passing automatically.")
         return jsonify({"valid": True}) # No password set = valid
     
     data = request.get_json(silent=True) or {}
+    log.info(f"[LOGIN API] Parsed JSON payload. Contains password field: {'yes' if 'password' in data else 'no'}")
     if data.get("password") == password:
+        log.info("[LOGIN API] Password matched successfully.")
         return jsonify({"valid": True})
+    
+    log.warning("[LOGIN API] Password mismatch or empty payload.")
     return jsonify({"valid": False}), 401
 
 @app.route("/api/run", methods=["POST"])

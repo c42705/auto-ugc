@@ -215,7 +215,9 @@
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log("[LOGIN] Form submitted");
             const pass = document.getElementById('ui-password').value;
+            console.log("[LOGIN] Extracted password from input. Length:", pass.length);
             const btn = e.target.querySelector('button[type="submit"]');
             const errorDiv = document.getElementById('login-error');
             const ogText = btn.innerHTML;
@@ -225,26 +227,31 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span><span role="status">Unlocking...</span>';
 
             try {
+                console.log("[LOGIN] Sending POST request to /api/login");
                 const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: pass })
                 });
 
+                console.log("[LOGIN] Response received. Status:", res.status, "OK:", res.ok);
+
                 if (res.ok) {
+                    console.log("[LOGIN] Authentication successful. Setting token and hiding overlay.");
                     sessionToken = pass;
                     sessionStorage.setItem('ui_token', pass);
                     document.getElementById('login-overlay').style.display = 'none';
                 } else {
-                    console.error("Login failed: Password incorrect or server denied access. HTTP Status:", res.status);
+                    console.error("[LOGIN] Login failed: Password incorrect or server denied access. HTTP Status:", res.status);
                     errorDiv.innerText = "Incorrect password.";
                     errorDiv.classList.remove('d-none');
                 }
             } catch (err) {
-                console.error("Login request failed due to a network or application error:", err);
+                console.error("[LOGIN] Login request failed due to a network or application error:", err);
                 errorDiv.innerText = "Connection error. Check console.";
                 errorDiv.classList.remove('d-none');
             } finally {
+                console.log("[LOGIN] Restoring button state.");
                 btn.disabled = false;
                 btn.innerHTML = ogText;
             }
@@ -252,34 +259,43 @@
 
         // Initialize display by asking if server requires auth
         async function checkAuthOnLoad() {
+            console.log("[AUTH_INIT] starting checkAuthOnLoad. Current local token exists?:", !!sessionToken);
             try {
                 // 1. Is auth required?
+                console.log("[AUTH_INIT] Fetching /api/auth_config");
                 const cfgRes = await fetch('/api/auth_config');
                 const cfg = await cfgRes.json();
+                console.log("[AUTH_INIT] Auth config received:", cfg);
 
                 if (!cfg.auth_required) {
+                    console.log("[AUTH_INIT] Auth not required. Hiding overlay.");
                     sessionToken = null;
                     document.getElementById('login-overlay').style.display = 'none';
                     return;
                 }
 
                 // 2. Auth required, do we have a cached token?
+                console.log("[AUTH_INIT] Auth required. Do we have a token stored?:", !!sessionToken);
                 if (sessionToken) {
+                    console.log("[AUTH_INIT] Testing cached token via /api/login POST");
                     const res = await apiCall('/api/login', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ password: sessionToken })
                     });
 
+                    console.log("[AUTH_INIT] Cached token test response. Status:", res.status, "OK:", res.ok);
                     if (res.ok) {
+                        console.log("[AUTH_INIT] Cached token is valid. Hiding overlay.");
                         document.getElementById('login-overlay').style.display = 'none';
                     } else {
+                        console.warn("[AUTH_INIT] Cached token invalid or server rejected. Clearing token.");
                         sessionToken = null;
                         sessionStorage.removeItem('ui_token');
                     }
                 }
             } catch (err) {
-                console.error("Initial auth check failed", err);
+                console.error("[AUTH_INIT] Initial auth check failed", err);
             }
         }
         checkAuthOnLoad();
