@@ -30,7 +30,7 @@ orchestrator = Orchestrator(socketio=socketio)
 @app.before_request
 def check_auth():
     password = os.getenv("UI_PASSWORD")
-    if password and request.path.startswith("/api/") and request.path != "/api/login":
+    if password and request.path.startswith("/api/") and request.path not in ["/api/login", "/api/auth_config"]:
         client_pwd = request.headers.get("X-UI-Password")
         if client_pwd != password:
             return jsonify({"error": "Unauthorized"}), 401
@@ -38,6 +38,11 @@ def check_auth():
 @app.route("/")
 def index():
     return send_from_directory("web", "index.html")
+
+@app.route("/api/auth_config", methods=["GET"])
+def auth_config():
+    password = os.getenv("UI_PASSWORD")
+    return jsonify({"auth_required": bool(password)})
 
 @app.route("/api/login", methods=["POST"])
 def login():

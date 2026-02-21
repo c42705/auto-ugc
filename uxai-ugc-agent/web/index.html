@@ -23,7 +23,8 @@
             <div class="card-body p-4">
                 <form id="login-form">
                     <!-- Accessibility trap for password managers -->
-                    <input type="text" name="username" autocomplete="username" class="d-none" value="admin">
+                    <input type="text" name="username" autocomplete="username" class="visually-hidden" tabindex="-1"
+                        value="admin">
                     <div class="mb-3">
                         <label class="form-label text-muted small text-uppercase fw-bold">System Password</label>
                         <input type="password" id="ui-password" class="form-control" required
@@ -249,25 +250,36 @@
             }
         });
 
-        // Initialize display if token exists
+        // Initialize display by asking if server requires auth
         async function checkAuthOnLoad() {
-            if (sessionToken) {
-                const res = await apiCall('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: sessionToken }) });
-                if (res.ok) {
-                    document.getElementById('login-overlay').style.display = 'none';
-                } else {
+            try {
+                // 1. Is auth required?
+                const cfgRes = await fetch('/api/auth_config');
+                const cfg = await cfgRes.json();
+
+                if (!cfg.auth_required) {
                     sessionToken = null;
-                }
-            } else {
-                // Check if server is enforcing auth at all
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({})
-                });
-                if (res.ok) {
                     document.getElementById('login-overlay').style.display = 'none';
+                    return;
                 }
+
+                // 2. Auth required, do we have a cached token?
+                if (sessionToken) {
+                    const res = await apiCall('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: sessionToken })
+                    });
+
+                    if (res.ok) {
+                        document.getElementById('login-overlay').style.display = 'none';
+                    } else {
+                        sessionToken = null;
+                        sessionStorage.removeItem('ui_token');
+                    }
+                }
+            } catch (err) {
+                console.error("Initial auth check failed", err);
             }
         }
         checkAuthOnLoad();
