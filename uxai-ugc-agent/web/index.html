@@ -22,6 +22,8 @@
             </div>
             <div class="card-body p-4">
                 <form id="login-form">
+                    <!-- Accessibility trap for password managers -->
+                    <input type="text" name="username" autocomplete="username" class="d-none" value="admin">
                     <div class="mb-3">
                         <label class="form-label text-muted small text-uppercase fw-bold">System Password</label>
                         <input type="password" id="ui-password" class="form-control" required
@@ -263,7 +265,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({})
                 });
-                if (res.ok) document.getElementById('login-overlay').style.display = 'none';
+                if (res.ok) {
+                    document.getElementById('login-overlay').style.display = 'none';
+                }
             }
         }
         checkAuthOnLoad();
@@ -575,7 +579,12 @@
 
         // Periodic Status Update
         setInterval(() => {
-            apiCall('/api/status').then(r => r.json()).then(data => {
+            if (!sessionToken) return; // Don't ping if not logged in
+            apiCall('/api/status').then(r => {
+                if (!r.ok) return;
+                return r.json();
+            }).then(data => {
+                if (!data) return;
                 updateRamBar({ percent: data.ram_percent });
                 if (data.status === 'running') {
                     toggleRunButton(true);
