@@ -240,7 +240,8 @@
                     console.log("[LOGIN] Authentication successful. Setting token and hiding overlay.");
                     sessionToken = pass;
                     sessionStorage.setItem('ui_token', pass);
-                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('login-overlay').classList.remove('d-flex');
+                    document.getElementById('login-overlay').classList.add('d-none');
                 } else {
                     console.error("[LOGIN] Login failed: Password incorrect or server denied access. HTTP Status:", res.status);
                     errorDiv.innerText = "Incorrect password.";
@@ -270,7 +271,8 @@
                 if (!cfg.auth_required) {
                     console.log("[AUTH_INIT] Auth not required. Hiding overlay.");
                     sessionToken = null;
-                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('login-overlay').classList.remove('d-flex');
+                    document.getElementById('login-overlay').classList.add('d-none');
                     return;
                 }
 
@@ -287,7 +289,8 @@
                     console.log("[AUTH_INIT] Cached token test response. Status:", res.status, "OK:", res.ok);
                     if (res.ok) {
                         console.log("[AUTH_INIT] Cached token is valid. Hiding overlay.");
-                        document.getElementById('login-overlay').style.display = 'none';
+                        document.getElementById('login-overlay').classList.remove('d-flex');
+                        document.getElementById('login-overlay').classList.add('d-none');
                     } else {
                         console.warn("[AUTH_INIT] Cached token invalid or server rejected. Clearing token.");
                         sessionToken = null;
