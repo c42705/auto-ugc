@@ -1,0 +1,10 @@
+# Environment variables
+.env
+*.env
+
+# Outputs
+uxai-ugc-agent/output/
+
+# Python caches
+__pycache__/
+*.pyc
