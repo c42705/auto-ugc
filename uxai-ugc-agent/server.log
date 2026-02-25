@@ -1,0 +1,339 @@
+nohup: ignoring input
+[31m[1m[2026-02-20 23:06:04] [ERROR] [MediaGeneratorAgent] Error in HeyGen segment 0: Expecting value: line 1 column 1 (char 0)[0m
+[31m[1m[2026-02-20 23:06:04] [ERROR] [Orchestrator] Step avatar_clips failed: Expecting value: line 1 column 1 (char 0)[0m
+[31m[1m[2026-02-20 23:06:04] [ERROR] [Orchestrator] Pipeline crashed: Expecting value: line 1 column 1 (char 0)[0m
+Exception in thread Thread-1 (run_pipeline):
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.10/threading.py", line 953, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/carlos/Documents/comandazo/auto-ugc/uxai-ugc-agent/agents/orchestrator.py", line 216, in run_pipeline
+    clip_paths = self._execute_step("avatar_clips", self.media_gen.generate_avatar_clips, final_script["segments"], audio_paths, self.session_path)
+  File "/home/carlos/Documents/comandazo/auto-ugc/uxai-ugc-agent/agents/orchestrator.py", line 95, in _execute_step
+    result = func(*args, **kwargs)
+  File "/home/carlos/Documents/comandazo/auto-ugc/uxai-ugc-agent/agents/media_generator.py", line 149, in generate_avatar_clips
+    asset_id = resp.json().get("data", {}).get("id")
+  File "/usr/lib/python3/dist-packages/requests/models.py", line 900, in json
+    return complexjson.loads(self.text, **kwargs)
+  File "/usr/lib/python3.10/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/usr/lib/python3.10/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/usr/lib/python3.10/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+[37m[2026-02-20 22:54:14] [INFO] [MediaGeneratorAgent] ElevenLabs voice validated: UgBBYS2sOqTuMpoF3BR0[0m
+[33m[2026-02-20 22:54:14] [WARNING] Missing API keys in .env: HEYGEN_API_KEY. Some pipeline steps may fail.[0m
+[37m[2026-02-20 22:54:14] [INFO] Starting web server at http://localhost:5000[0m
+[37m[2026-02-20 22:54:15] [INFO] [AUTH_CONFIG] Request received. UI_PASSWORD is set: True[0m
+[37m[2026-02-20 22:54:21] [INFO] [LOGIN API] Request received.[0m
+[37m[2026-02-20 22:54:21] [INFO] [LOGIN API] Parsed JSON payload. Contains password field: yes[0m
+[37m[2026-02-20 22:54:21] [INFO] [LOGIN API] Password matched successfully.[0m
+[37m[2026-02-20 22:55:44] [INFO] [AUTH_CONFIG] Request received. UI_PASSWORD is set: True[0m
+[37m[2026-02-20 22:55:44] [INFO] [LOGIN API] Request received.[0m
+[37m[2026-02-20 22:55:44] [INFO] [LOGIN API] Parsed JSON payload. Contains password field: yes[0m
+[37m[2026-02-20 22:55:44] [INFO] [LOGIN API] Password matched successfully.[0m
+[37m[2026-02-20 22:56:40] [INFO] [AUTH_CONFIG] Request received. UI_PASSWORD is set: True[0m
+[37m[2026-02-20 22:56:40] [INFO] [LOGIN API] Request received.[0m
+[37m[2026-02-20 22:56:40] [INFO] [LOGIN API] Parsed JSON payload. Contains password field: yes[0m
+[37m[2026-02-20 22:56:40] [INFO] [LOGIN API] Password matched successfully.[0m
+[37m[2026-02-20 23:03:52] [INFO] [AUTH_CONFIG] Request received. UI_PASSWORD is set: True[0m
+[37m[2026-02-20 23:04:05] [INFO] [LOGIN API] Request received.[0m
+[37m[2026-02-20 23:04:05] [INFO] [LOGIN API] Parsed JSON payload. Contains password field: yes[0m
+[37m[2026-02-20 23:04:05] [INFO] [LOGIN API] Password matched successfully.[0m
+[37m[2026-02-20 23:04:48] [INFO] [Orchestrator] Pipeline started. Session: 2026-02-20-230448[0m
+[37m[2026-02-20 23:04:48] [INFO] [Orchestrator] >>> Executing step: research[0m
+[37m[2026-02-20 23:04:48] [INFO] [Orchestrator] Memory Status: 3363.6MB available (78.8%)[0m
+[37m[2026-02-20 23:04:48] [INFO] [ResearcherAgent] Starting research phase...[0m
+[33m[2026-02-20 23:04:48] [WARNING] [ResearcherAgent] Error searching r/UXResearch: received 401 HTTP response[0m
+[33m[2026-02-20 23:04:48] [WARNING] [ResearcherAgent] Error searching r/userexperience: received 401 HTTP response[0m
+[33m[2026-02-20 23:04:49] [WARNING] [ResearcherAgent] Error searching r/recruiting: received 401 HTTP response[0m
+[33m[2026-02-20 23:04:49] [WARNING] [ResearcherAgent] Error searching r/artificial: received 401 HTTP response[0m
+[33m[2026-02-20 23:04:49] [WARNING] [ResearcherAgent] Error searching r/productdesign: received 401 HTTP response[0m
+[33m[2026-02-20 23:04:49] [WARNING] [ResearcherAgent] Error searching r/ExperiencedDevs: received 401 HTTP response[0m
+[33m[2026-02-20 23:04:49] [WARNING] [ResearcherAgent] Error searching r/remotework: received 401 HTTP response[0m
+[37m[2026-02-20 23:05:05] [INFO] [LLMClient] Using model: meta-llama/llama-3.2-3b-instruct[0m
+[37m[2026-02-20 23:05:05] [INFO] [LLMClient] Model: meta-llama/llama-3.2-3b-instruct | Prompt: 361 | Completion: 1399[0m
+[32m[1m[2026-02-20 23:05:05] [SUCCESS] [ResearcherAgent] Research phase complete. Found 5 pain points.[0m
+[33m[2026-02-20 23:05:05] [WARNING] [Orchestrator] WAITING FOR HUMAN REVIEW: review_research (Timeout: 120s)[0m
+[32m[1m[2026-02-20 23:05:15] [SUCCESS] [Orchestrator] Human review received for review_research[0m
+[37m[2026-02-20 23:05:15] [INFO] [Orchestrator] >>> Executing step: ideation[0m
+[37m[2026-02-20 23:05:15] [INFO] [Orchestrator] Memory Status: 3413.7MB available (78.5%)[0m
+[37m[2026-02-20 23:05:15] [INFO] [WriterAgent] Generating content ideas from research...[0m
+[37m[2026-02-20 23:05:19] [INFO] [LLMClient] Using model: meta-llama/llama-3.2-3b-instruct[0m
+[37m[2026-02-20 23:05:19] [INFO] [LLMClient] Model: meta-llama/llama-3.2-3b-instruct | Prompt: 1809 | Completion: 286[0m
+[32m[1m[2026-02-20 23:05:19] [SUCCESS] [WriterAgent] Generated best idea: The AI Skills Gap in UX Design: Why It Matters[0m
+[37m[2026-02-20 23:05:19] [INFO] [Orchestrator] >>> Executing step: scripting[0m
+[37m[2026-02-20 23:05:19] [INFO] [Orchestrator] Memory Status: 3418.3MB available (78.5%)[0m
+[37m[2026-02-20 23:05:19] [INFO] [WriterAgent] Writing script for idea: The AI Skills Gap in UX Design: Why It Matters[0m
+[37m[2026-02-20 23:05:26] [INFO] [LLMClient] Using model: meta-llama/llama-3.2-3b-instruct[0m
+[37m[2026-02-20 23:05:26] [INFO] [LLMClient] Model: meta-llama/llama-3.2-3b-instruct | Prompt: 582 | Completion: 583[0m
+[32m[1m[2026-02-20 23:05:26] [SUCCESS] [WriterAgent] Script v1 written and saved.[0m
+[33m[2026-02-20 23:05:26] [WARNING] [Orchestrator] WAITING FOR HUMAN REVIEW: review_script (Timeout: 120s)[0m
+[32m[1m[2026-02-20 23:05:32] [SUCCESS] [Orchestrator] Human review received for review_script[0m
+[37m[2026-02-20 23:05:32] [INFO] [Orchestrator] >>> Executing step: qa_loop[0m
+[37m[2026-02-20 23:05:32] [INFO] [Orchestrator] Memory Status: 3372.1MB available (78.8%)[0m
+[37m[2026-02-20 23:05:32] [INFO] [QAReviewerAgent] Starting script improvement loop...[0m
+[37m[2026-02-20 23:05:32] [INFO] [QAReviewerAgent] Reviewing script (Iteration 1)...[0m
+[37m[2026-02-20 23:05:35] [INFO] [LLMClient] Using model: meta-llama/llama-3.2-3b-instruct[0m
+[37m[2026-02-20 23:05:35] [INFO] [LLMClient] Model: meta-llama/llama-3.2-3b-instruct | Prompt: 2523 | Completion: 345[0m
+[37m[2026-02-20 23:05:35] [INFO] [QAReviewerAgent] Script Score: 7.8/10 | Approved: True[0m
+[33m[2026-02-20 23:05:35] [WARNING] [Orchestrator] WAITING FOR HUMAN REVIEW: review_qa (Timeout: 120s)[0m
+[32m[1m[2026-02-20 23:05:54] [SUCCESS] [Orchestrator] Human review received for review_qa[0m
+[37m[2026-02-20 23:05:54] [INFO] [Orchestrator] >>> Executing step: voiceover[0m
+[37m[2026-02-20 23:05:54] [INFO] [Orchestrator] Memory Status: 3399.0MB available (78.6%)[0m
+[37m[2026-02-20 23:05:54] [INFO] [MediaGeneratorAgent] Generating voiceovers with ElevenLabs...[0m
+[37m[2026-02-20 23:05:55] [INFO] [MediaGeneratorAgent] Generated audio for segment 0: ./output/2026-02-20-230448/audio/segment_0.mp3[0m
+[37m[2026-02-20 23:05:57] [INFO] [MediaGeneratorAgent] Generated audio for segment 1: ./output/2026-02-20-230448/audio/segment_1.mp3[0m
+[37m[2026-02-20 23:05:59] [INFO] [MediaGeneratorAgent] Generated audio for segment 2: ./output/2026-02-20-230448/audio/segment_2.mp3[0m
+[37m[2026-02-20 23:06:01] [INFO] [MediaGeneratorAgent] Generated audio for segment 3: ./output/2026-02-20-230448/audio/segment_3.mp3[0m
+[37m[2026-02-20 23:06:03] [INFO] [MediaGeneratorAgent] Generated audio for segment 4: ./output/2026-02-20-230448/audio/segment_4.mp3[0m
+[37m[2026-02-20 23:06:03] [INFO] [Orchestrator] >>> Executing step: avatar_clips[0m
+[37m[2026-02-20 23:06:03] [INFO] [Orchestrator] Memory Status: 3350.2MB available (78.9%)[0m
+[37m[2026-02-20 23:06:03] [INFO] [MediaGeneratorAgent] Generating avatar clips with HeyGen (Sequential)...[0m
+[37m[2026-02-20 23:06:03] [INFO] [MediaGeneratorAgent] Processing HeyGen clip 1/5[0m
+[33m[2026-02-20 23:06:06] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:06] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:06] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:06] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:06] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:06:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:07:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:07:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:07:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:07:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:07:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:07:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:07:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:07:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:07:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:07:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:08:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:08:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:08:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:08:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:08:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:08:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:08:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:08:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:08:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:08:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:09:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:09:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:09:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:09:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:09:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:09:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:09:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:09:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:09:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:09:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:10:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:10:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:10:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:10:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:10:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:10:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:10:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:10:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:10:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:10:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:11:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:11:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:11:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:11:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:11:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:11:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:11:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:11:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:11:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:11:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:12:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:12:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:12:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:12:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:12:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:12:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:12:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:12:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:12:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:12:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:13:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:13:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:13:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:13:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:13:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:13:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:13:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:13:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:13:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:13:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:14:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:14:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:14:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:14:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:14:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:14:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:14:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:14:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:14:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:14:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:15:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:15:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:15:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:15:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:15:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:15:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:15:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:15:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:15:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:15:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:16:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:16:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:16:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:16:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:16:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:16:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:16:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:16:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:16:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:16:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:17:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:17:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:17:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:17:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:17:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:17:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:17:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:17:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:17:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:17:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:18:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:18:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:18:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:18:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:18:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:18:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:18:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:18:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:18:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:18:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:19:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:19:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:19:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:19:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:19:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:19:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:19:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:19:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:19:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:19:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:20:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:20:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:20:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:20:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:20:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:20:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:20:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:20:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:20:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:20:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:21:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:21:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:21:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:21:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:21:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:21:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:21:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:21:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:21:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:21:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:22:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:22:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:22:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:22:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:22:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:22:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:22:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:22:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:22:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:22:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:23:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:23:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:23:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:23:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:23:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:23:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:23:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:23:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:23:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:23:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:24:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:24:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:24:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:24:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:24:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:24:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:24:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:24:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:24:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:24:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:25:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:25:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:25:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:25:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:25:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:25:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:25:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:25:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:25:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:25:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:26:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:26:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:26:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:26:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:26:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:26:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:26:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:26:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:26:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:26:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:27:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:27:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:27:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:27:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:27:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:27:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:27:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:27:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:27:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:27:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:28:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:28:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:28:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:28:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:28:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:28:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:28:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:28:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:28:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:28:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:29:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:29:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:29:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:29:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:29:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_2.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:29:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_0.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:29:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_1.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:29:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_3.mp3 from client IP: 127.0.0.1[0m
+[33m[2026-02-20 23:29:32] [WARNING] [AUTH] Failed auth on /api/files/2026-02-20-230448/audio/segment_4.mp3 from client IP: 127.0.0.1[0m

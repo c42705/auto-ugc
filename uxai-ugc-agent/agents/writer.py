@@ -195,13 +195,32 @@ class WriterAgent:
         """
         Generate social media captions, hashtags, and metadata.
         """
-        self.log.info("Generating social metadata...", context="WriterAgent")
-        
         system_prompt = "You are a social media manager for a high-end B2B brand. Generate punchy, professional, and accessible metadata for a video script."
-        user_prompt = f"VIDEO SCRIPT:\n{json.dumps(script, indent=2)}\n\nGenerate captions for LinkedIn, IG, and TikTok, plus hashtags and alt-text."
+        
+        schema = {
+            "caption_linkedin": "str",
+            "caption_tiktok": "str",
+            "caption_instagram": "str",
+            "hashtags": ["str"],
+            "alt_text": "str"
+        }
+        
+        user_prompt = f"""
+        VIDEO SCRIPT:
+        {json.dumps(script, indent=2)}
+        
+        Generate captions and hashtags following this schema:
+        {json.dumps(schema, indent=2)}
+        """
         
         try:
             return self.llm.complete_json(system_prompt, user_prompt, model="fast")
         except Exception as e:
             self.log.error(f"Metadata generation failed: {e}", context="WriterAgent")
-            return {}
+            return {
+                "caption_linkedin": "Error generating captions.",
+                "caption_tiktok": "",
+                "caption_instagram": "",
+                "hashtags": [],
+                "alt_text": ""
+            }

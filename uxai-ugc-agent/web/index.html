@@ -7,6 +7,53 @@
     <title>UX·AI UGC Content Agent</title>
     <!-- Bootswatch Lux Theme -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5/dist/lux/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .audio-player-mini {
+            height: 40px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        .waveform-container {
+            flex-grow: 1;
+            height: 30px;
+        }
+
+        .session-item {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .session-item:hover {
+            background-color: var(--bs-gray-200);
+        }
+
+        .session-item.active {
+            background-color: var(--bs-primary);
+            color: white;
+        }
+
+        #archive-log-preview {
+            font-size: 0.75rem;
+            max-height: 150px;
+            overflow-y: auto;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .script-table-container {
+            max-height: calc(100vh - 350px);
+            overflow-y: auto;
+        }
+    </style>
 </head>
 
 <body class="vh-100 overflow-hidden d-flex flex-column">
@@ -51,9 +98,9 @@
                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
                     </div>
                 </div>
-                <button class="btn btn-sm fw-bold text-uppercase" data-bs-toggle="modal"
+                <button class="btn btn-sm btn-secondary fw-bold text-uppercase" data-bs-toggle="modal"
                     data-bs-target="#settingsModal">
-                    ⚙ Settings
+                    <i class="bi bi-gear-fill me-1"></i> Settings
                 </button>
             </div>
         </div>
@@ -80,8 +127,8 @@
                         <input type="text" id="topic-override" class="form-control border-secondary"
                             placeholder="e.g. Fintech UX gaps...">
                     </div>
-                    <button id="btn-run" class="btn btn-success fw-bold px-4 py-2 text-uppercase"
-                        style="min-width: 180px;">▶ RUN PIPELINE</button>
+                    <button id="btn-run" class="btn btn-primary fw-bold px-4 py-2 text-uppercase"
+                        style="min-width: 180px;"><i class="bi bi-play-fill me-1"></i> RUN PIPELINE</button>
                 </div>
             </div>
 
@@ -101,6 +148,11 @@
                             <button class="nav-link fw-bold text-uppercase" id="output-tab" data-bs-toggle="tab"
                                 data-bs-target="#output-pane" type="button" role="tab">Output</button>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold text-uppercase" id="archive-tab" data-bs-toggle="tab"
+                                data-bs-target="#archive-pane" type="button" role="tab"><i
+                                    class="bi bi-archive-fill me-1"></i> Archive</button>
+                        </li>
                     </ul>
                 </div>
                 <div class="card-body bg-body-tertiary rounded-bottom">
@@ -108,7 +160,7 @@
                         <div class="tab-pane fade show active" id="log-pane" role="tabpanel">
                             <div class="d-flex justify-content-end mb-3">
                                 <button id="clear-log"
-                                    class="btn btn-sm btn-outline-secondary text-uppercase flex-shrink-0">Clear
+                                    class="btn btn-sm btn-secondary text-uppercase flex-shrink-0">Clear
                                     Log</button>
                             </div>
                             <div id="log-view" class="font-monospace overflow-auto p-3 bg-body rounded border"
@@ -125,6 +177,88 @@
                                 <h3 class="h5 text-center text-muted py-5 mt-4">Waiting for final render...</h3>
                             </div>
                         </div>
+                        <div class="tab-pane fade" id="archive-pane" role="tabpanel">
+                            <div class="row h-100" style="min-height: 500px;">
+                                <div class="col-md-3 border-end">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h4 class="h6 mb-0 text-uppercase fw-bold">Recent Sessions</h4>
+                                        <button id="refresh-sessions"
+                                            class="btn btn-sm btn-secondary text-uppercase px-2"
+                                            style="font-size: 0.7rem;">
+                                            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                                        </button>
+                                    </div>
+                                    <div id="session-list" class="list-group list-group-flush rounded border">
+                                        <!-- Sessions dynamic list -->
+                                    </div>
+                                </div>
+                                <div class="col-md-9 ps-4">
+                                    <div id="session-detail-view" class="d-none">
+                                        <div class="d-flex justify-content-between align-items-start mb-4">
+                                            <div>
+                                                <h3 id="detail-session-id" class="h5 fw-bold mb-1">--</h3>
+                                                <p id="detail-session-meta" class="small text-muted mb-0">--</p>
+                                            </div>
+                                            <div id="session-actions">
+                                                <!-- Action buttons -->
+                                            </div>
+                                        </div>
+
+                                        <ul class="nav nav-pills nav-sm mb-3" id="detailTabs" role="tablist">
+                                            <li class="nav-item"><button class="nav-link active py-1 px-3"
+                                                    data-bs-toggle="tab" data-bs-target="#detail-script">Script &
+                                                    Audio</button></li>
+                                            <li class="nav-item"><button class="nav-link py-1 px-3" data-bs-toggle="tab"
+                                                    data-bs-target="#detail-clips">Videos</button></li>
+                                            <li class="nav-item"><button class="nav-link py-1 px-3" data-bs-toggle="tab"
+                                                    data-bs-target="#detail-log">Logs</button></li>
+                                            <li class="nav-item"><button class="nav-link py-1 px-3" data-bs-toggle="tab"
+                                                    data-bs-target="#detail-meta">Social Metadata</button></li>
+                                        </ul>
+
+                                        <div class="tab-content border rounded bg-white p-3">
+                                            <div class="tab-pane fade show active" id="detail-script">
+                                                <div class="script-table-container">
+                                                    <table class="table table-sm table-hover align-middle mb-0">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>ID</th>
+                                                                <th>Script Text</th>
+                                                                <th style="width: 100px;">Visual</th>
+                                                                <th style="width: 250px;">Audio Player</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="detail-script-body">
+                                                            <!-- Script rows dynamically inserted -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade" id="detail-clips">
+                                                <div id="detail-clips-grid" class="row g-3">
+                                                    <!-- Clip players here -->
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade" id="detail-log">
+                                                <pre id="archive-log-preview" class="font-monospace mb-0"></pre>
+                                            </div>
+                                            <div class="tab-pane fade" id="detail-meta">
+                                                <div id="detail-meta-content" class="small">
+                                                    <!-- Metadata dynamic content -->
+                                                    <div class="text-center py-4 text-muted">No metadata available.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="session-empty-state" class="text-center py-5">
+                                        <div class="display-1 text-muted opacity-25 mb-3"><i
+                                                class="bi bi-folder-fill"></i></div>
+                                        <h5 class="text-muted">Select a session from the list to view details</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -138,8 +272,9 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-warning shadow-lg border-2">
                 <div class="modal-header text-bg-warning py-3">
-                    <h2 class="h5 modal-title mb-0 text-dark fw-bold" id="reviewModalLabel">⏳ Review Window: <span
-                            id="review-step-name">--</span></h2>
+                    <h2 class="h5 modal-title mb-0 text-dark fw-bold" id="reviewModalLabel"><i
+                            class="bi bi-hourglass-split me-1"></i> Review Window: <span id="review-step-name">--</span>
+                    </h2>
                     <span id="countdown-text" class="text-dark small text-uppercase ms-3 mt-1 fw-bold">Auto-continuing
                         in --s</span>
                 </div>
@@ -152,8 +287,10 @@
                     <textarea id="review-json" class="font-monospace bg-body text-body border rounded p-2 mb-3 w-100"
                         style="font-size: 0.85rem; height: 300px;"></textarea>
                     <div class="d-flex justify-content-end gap-2">
-                        <button id="btn-submit-override" class="btn btn-success fw-bold">✅ Submit My Changes</button>
-                        <button id="btn-continue" class="btn btn-secondary fw-bold">⏭ Continue Now</button>
+                        <button id="btn-submit-override" class="btn btn-primary fw-bold"><i
+                                class="bi bi-check-lg me-1"></i> Submit My Changes</button>
+                        <button id="btn-continue" class="btn btn-secondary fw-bold"><i
+                                class="bi bi-skip-forward-fill me-1"></i> Continue Now</button>
                     </div>
                 </div>
             </div>
@@ -200,11 +337,70 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js@7"></script>
     <script>
         const socket = io();
         let sessionToken = sessionStorage.getItem('ui_token');
         let isRunning = false;
         let authReady = false;  // true once we know the token is valid
+        let wavesurfers = []; // track wavesurfer instances to clean up
+
+        function cleanupWavesurfers() {
+            wavesurfers.forEach(ws => {
+                if (ws && typeof ws.destroy === 'function') ws.destroy();
+            });
+            wavesurfers = [];
+        }
+
+        function authUrl(url) {
+            if (!url) return url;
+            if (!sessionToken) return url;
+            const sep = url.includes('?') ? '&' : '?';
+            return `${url}${sep}pwd=${encodeURIComponent(sessionToken)}`;
+        }
+
+        function createMiniAudioPlayer(url, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="audio-player-mini">
+                    <button class="btn btn-sm btn-primary rounded-circle p-0 d-flex align-items-center justify-content-center play-btn" style="width: 24px; height: 24px;">
+                        <i class="bi bi-play-fill" style="font-size: 0.75rem;"></i>
+                    </button>
+                    <div class="waveform-container"></div>
+                    <span class="small text-muted duration" style="font-size: 0.65rem;">0:00</span>
+                </div>
+            `;
+
+            const ws = WaveSurfer.create({
+                container: container.querySelector('.waveform-container'),
+                waveColor: '#ced4da',
+                progressColor: '#343a40',
+                cursorWidth: 0,
+                barWidth: 2,
+                barGap: 1,
+                barRadius: 2,
+                height: 30,
+                url: url,
+                fetchParams: {
+                    headers: sessionToken ? { 'X-UI-Password': sessionToken } : {}
+                }
+            });
+
+            const playBtn = container.querySelector('.play-btn');
+            playBtn.onclick = () => ws.playPause();
+
+            ws.on('play', () => playBtn.innerHTML = '<i class="bi bi-pause-fill" style="font-size: 0.75rem;"></i>');
+            ws.on('pause', () => playBtn.innerHTML = '<i class="bi bi-play-fill" style="font-size: 0.75rem;"></i>');
+            ws.on('ready', () => {
+                const dur = ws.getDuration();
+                container.querySelector('.duration').innerText = `${Math.floor(dur / 60)}:${Math.floor(dur % 60).toString().padStart(2, '0')}`;
+            });
+
+            wavesurfers.push(ws);
+            return ws;
+        }
 
         // Initialize Bootstrap modal components immediately — the DOM is ready
         // since this script is at the bottom of <body>. DOMContentLoaded may
@@ -570,7 +766,7 @@
             if (!silent) {
                 appendLog({
                     level: 'SUCCESS',
-                    msg: `✅ State restored — ${restored} steps recovered, pipeline ${data.status}, ${fmtElapsed(data.elapsed_seconds)} elapsed.`
+                    msg: `<i class="bi bi-check-lg me-1"></i> State restored — ${restored} steps recovered, pipeline ${data.status}, ${fmtElapsed(data.elapsed_seconds)} elapsed.`
                 });
             }
         }
@@ -581,13 +777,13 @@
             const btn = document.getElementById('btn-run');
             const badge = document.getElementById('pipeline-status-badge');
             if (running) {
-                btn.className = "btn btn-danger fw-bold px-4 py-2 text-uppercase";
-                btn.innerHTML = "⏹ CANCEL PIPELINE";
+                btn.className = "btn btn-secondary fw-bold px-4 py-2 text-uppercase";
+                btn.innerHTML = '<i class="bi bi-stop-fill me-1"></i> CANCEL PIPELINE';
                 badge.className = 'badge text-bg-primary me-3 my-auto fs-6 px-3 py-2';
                 badge.innerText = 'RUNNING';
             } else {
-                btn.className = "btn btn-success fw-bold px-4 py-2 text-uppercase";
-                btn.innerHTML = "▶ RUN PIPELINE";
+                btn.className = "btn btn-primary fw-bold px-4 py-2 text-uppercase";
+                btn.innerHTML = '<i class="bi bi-play-fill me-1"></i> RUN PIPELINE';
                 // Only reset badge to IDLE if it wasn't already set to COMPLETE/FAILED
                 if (!['COMPLETE', 'FAILED'].includes(badge.innerText)) {
                     badge.className = 'badge text-bg-secondary me-3 my-auto fs-6 px-3 py-2';
@@ -618,20 +814,26 @@
             } else if (status === 'review') {
                 el.classList.add('border', 'border-warning', 'bg-body-secondary');
                 numberEl.classList.add('border-warning', 'text-warning');
-                statusEl.innerHTML = '⏳ Awaiting Review';
+                statusEl.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Awaiting Review';
             } else if (status === 'done') {
                 numberEl.classList.add('bg-success', 'border-success', 'text-white');
-                statusEl.innerHTML = '✓ Done';
+                statusEl.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Done';
             } else if (status === 'error') {
                 numberEl.classList.add('bg-danger', 'border-danger', 'text-white');
-                statusEl.innerHTML = '✗ Error';
+                statusEl.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i> Error';
             } else {
                 numberEl.classList.add('border-secondary', 'text-secondary');
                 statusEl.innerHTML = 'Pending';
             }
 
-            if (status === 'done' && step === 'scripting') {
-                renderScript(data && data.result);
+            if (status === 'done' && (step === 'scripting' || step === 'voiceover')) {
+                apiCall('/api/status').then(r => r.json()).then(state => {
+                    if (state.session_id) {
+                        apiCall(`/api/sessions/${state.session_id}`).then(r => r.json()).then(session => {
+                            renderScript(session.script, session.audio);
+                        });
+                    }
+                });
             }
         }
 
@@ -642,7 +844,7 @@
             line.className = `mb-1 ${levelColors[data.level] || 'text-body'}`;
             line.style.fontSize = '0.9rem';
             const timestamp = new Date().toLocaleTimeString();
-            line.innerText = `[${timestamp}] [${data.level}] ${data.msg}`;
+            line.innerHTML = `[${timestamp}] [${data.level}] ${data.msg}`;
             logView.appendChild(line);
             logView.scrollTop = logView.scrollHeight;
         }
@@ -690,13 +892,17 @@
             clearInterval(reviewTimer);
         }
 
-        function renderScript(script) {
+        function renderScript(script, audioFiles = []) {
             const container = document.getElementById('script-cards');
             container.innerHTML = '';
 
             if (!script || !script.segments) return;
+            cleanupWavesurfers();
 
-            script.segments.forEach(seg => {
+            script.segments.forEach((seg, idx) => {
+                const audio = audioFiles.find(a => a.stem === `segment_${idx}` || a.name.includes(`segment_${idx}`));
+                const audioHtml = audio ? `<div id="script-audio-${idx}" class="mt-2"></div>` : '';
+
                 const col = document.createElement('div');
                 col.className = 'col-md-6 col-lg-4';
                 col.innerHTML = `
@@ -707,6 +913,7 @@
                                 <span class="badge text-bg-primary">${seg.duration_seconds}s</span>
                             </div>
                             <p class="small mb-2">${seg.text}</p>
+                            ${audioHtml}
                             <hr>
                             <div class="small text-muted"><strong>Screen:</strong> ${seg.on_screen_text}</div>
                             <div class="small text-muted text-info"><strong>Mood:</strong> ${seg.emotion_cue}</div>
@@ -714,7 +921,172 @@
                     </div>
                 `;
                 container.appendChild(col);
+
+                if (audio) {
+                    setTimeout(() => createMiniAudioPlayer(audio.url, `script-audio-${idx}`), 50);
+                }
             });
+        }
+
+        async function loadSessions() {
+            const listContainer = document.getElementById('session-list');
+            listContainer.innerHTML = '<div class="text-center p-3 small text-muted">Loading...</div>';
+
+            try {
+                const res = await apiCall('/api/sessions');
+                const data = await res.json();
+                listContainer.innerHTML = '';
+
+                if (!data.sessions || data.sessions.length === 0) {
+                    listContainer.innerHTML = '<div class="text-center p-3 small text-muted">No sessions found</div>';
+                    return;
+                }
+
+                data.sessions.forEach(s => {
+                    const btn = document.createElement('button');
+                    btn.className = 'list-group-item list-group-item-action session-item p-3 border-0 border-bottom';
+                    btn.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold small">${s.id}</span>
+                            <span class="badge ${s.has_clips ? 'text-bg-success' : 'text-bg-light'} px-1" style="font-size: 0.6rem;">${s.has_clips ? 'READY' : 'PARTIAL'}</span>
+                        </div>
+                        <div class="small text-muted" style="font-size: 0.65rem;">
+                            ${s.has_script ? '<i class="bi bi-check me-1"></i>Script ' : ''} ${s.has_audio ? '<i class="bi bi-check me-1"></i>Audio ' : ''} ${s.has_clips ? '<i class="bi bi-check me-1"></i>Video' : ''}
+                        </div>
+                    `;
+                    btn.onclick = () => loadSessionDetail(s.id, btn);
+                    listContainer.appendChild(btn);
+                });
+            } catch (err) {
+                listContainer.innerHTML = '<div class="text-center p-3 small text-danger">Error loading archive</div>';
+            }
+        }
+
+        async function loadSessionDetail(sessionId, btnEl) {
+            // UI state
+            document.querySelectorAll('.session-item').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+
+            document.getElementById('session-empty-state').classList.add('d-none');
+            const view = document.getElementById('session-detail-view');
+            view.classList.remove('d-none');
+            view.style.opacity = '0.5';
+
+            try {
+                const res = await apiCall(`/api/sessions/${sessionId}`);
+                const data = await res.json();
+                view.style.opacity = '1';
+
+                document.getElementById('detail-session-id').innerText = data.id;
+                document.getElementById('detail-session-meta').innerText = `Session Archive • Files: ${data.audio.length} audio, ${data.clips.length} clips`;
+
+                // Render Script Table
+                const tbody = document.getElementById('detail-script-body');
+                tbody.innerHTML = '';
+                cleanupWavesurferGroup('archive'); // logic split or unified?
+
+                if (data.script && data.script.segments) {
+                    data.script.segments.forEach((seg, idx) => {
+                        const tr = document.createElement('tr');
+                        const audio = data.audio.find(a => a.stem === `segment_${idx}`);
+                        const audioId = `archive-audio-${data.id}-${idx}`;
+
+                        tr.innerHTML = `
+                            <td><span class="badge text-bg-light border">${seg.id}</span></td>
+                            <td class="small pe-4">${seg.text} <div class="mt-1 text-muted fw-bold" style="font-size: 0.65rem;">"${seg.on_screen_text}"</div></td>
+                            <td class="small text-muted">${seg.visual_suggestion}</td>
+                            <td><div id="${audioId}"></div></td>
+                        `;
+                        tbody.appendChild(tr);
+
+                        if (audio) {
+                            setTimeout(() => createMiniAudioPlayer(audio.url, audioId), 50);
+                        } else {
+                            document.getElementById(audioId).innerHTML = '<span class="small text-muted">No audio gen</span>';
+                        }
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">No script data available for this session.</td></tr>';
+                }
+
+                // Render Video Clips
+                const clipsGrid = document.getElementById('detail-clips-grid');
+                clipsGrid.innerHTML = '';
+                if (data.clips.length > 0) {
+                    data.clips.forEach(clip => {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-6';
+                        col.innerHTML = `
+                            <div class="card border-0 shadow-sm bg-light">
+                                <div class="card-body p-2">
+                                    <video controls class="w-100 rounded mb-2" style="max-height: 200px; background: black;">
+                                        <source src="${authUrl(clip.url)}" type="video/mp4">
+                                    </video>
+                                    <div class="small fw-bold text-center">${clip.name}</div>
+                                </div>
+                            </div>
+                        `;
+                        clipsGrid.appendChild(col);
+                    });
+                } else {
+                    clipsGrid.innerHTML = '<div class="col-12 text-center py-4 text-muted">No video clips generated yet.</div>';
+                }
+
+                // Show Log
+                document.getElementById('archive-log-preview').innerText = data.log || "No log entries found.";
+
+                // Render Metadata
+                const metaContent = document.getElementById('detail-meta-content');
+                if (data.manifest && data.manifest.social_metadata) {
+                    const sm = data.manifest.social_metadata;
+                    metaContent.innerHTML = `
+                        <div class="mb-3">
+                            <h6 class="fw-bold text-uppercase small text-muted">LinkedIn Caption</h6>
+                            <div class="p-2 bg-light rounded border">${sm.caption_linkedin}</div>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="fw-bold text-uppercase small text-muted">TikTok Caption</h6>
+                            <div class="p-2 bg-light rounded border">${sm.caption_tiktok}</div>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-uppercase small text-muted">Hashtags</h6>
+                            <div>${sm.hashtags.map(h => `<span class="badge text-bg-info me-1">#${h}</span>`).join('')}</div>
+                        </div>
+                    `;
+                } else {
+                    metaContent.innerHTML = '<div class="text-center py-4 text-muted">Social metadata not generated yet for this session.</div>';
+                }
+
+                // Update Script Table with Image Thumbnails if available
+                if (data.images && data.images.length > 0) {
+                    data.script.segments.forEach((seg, idx) => {
+                        const img = data.images.find(i => i.stem === `bg_${idx}`);
+                        if (img) {
+                            const visualCell = tbody.rows[idx].cells[2];
+                            visualCell.innerHTML = `
+                                <div class="mb-1">${seg.visual_suggestion}</div>
+                                <img src="${authUrl(img.url)}" class="rounded shadow-sm border" style="width: 80px; cursor: zoom-in;" onclick="window.open(authUrl('${img.url}'))">
+                           `;
+                        }
+                    });
+                }
+
+                // Actions
+                const actions = document.getElementById('session-actions');
+                actions.innerHTML = `
+                    <a href="${authUrl(`/api/sessions/${sessionId}/download`)}" class="btn btn-sm btn-secondary fw-bold px-3">
+                        <i class="bi bi-download me-1"></i> Download All (.zip)
+                    </a>
+                `;
+
+            } catch (err) {
+                console.error("Error loading session detail:", err);
+            }
+        }
+
+        function cleanupWavesurferGroup(group) {
+            // For now unified cleanup is enough as we switch tabs
+            cleanupWavesurfers();
         }
 
         function showOutputPanel(data) {
@@ -725,11 +1097,11 @@
                 <div class="col-md-6 mb-4">
                     <h2 class="h6 fw-bold">Visual Production</h2>
                     <video controls class="w-100 rounded shadow">
-                        <source src="/api/files/${manifest.media_files.vertical_720p}" type="video/mp4">
+                        <source src="${authUrl(`/api/files/${data.session_id}/finalize/${manifest.media_files.vertical_720p}`)}" type="video/mp4">
                     </video>
                     <div class="mt-3 d-grid gap-2">
-                        <a href="/api/files/${manifest.media_files.vertical_720p}" download class="btn btn-outline-primary btn-sm">Download 720p</a>
-                        <a href="/api/files/${manifest.media_files.square}" download class="btn btn-outline-secondary btn-sm">Download Square (IG)</a>
+                        <a href="${authUrl(`/api/files/${data.session_id}/finalize/${manifest.media_files.vertical_720p}`)}" download class="btn btn-primary btn-sm">Download 720p</a>
+                        <a href="${authUrl(`/api/files/${data.session_id}/finalize/${manifest.media_files.square}`)}" download class="btn btn-secondary btn-sm">Download Square (IG)</a>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -817,6 +1189,14 @@
             document.getElementById('log-view').innerHTML = '';
         });
 
+        document.getElementById('archive-tab').addEventListener('shown.bs.tab', () => {
+            loadSessions();
+        });
+
+        document.getElementById('refresh-sessions').addEventListener('click', () => {
+            loadSessions();
+        });
+
         // Periodic Status Update — full state reconciliation every 5s.
         // This is the safety net: even if socket events were missed, the stepper
         // will converge to the correct state within one poll cycle.
@@ -825,7 +1205,6 @@
             syncServerState(true).catch(() => { }); // silent=true: no log spam every 5s
         }, 5000);
 
-        // (syncServerState is called explicitly from login handlers and socket 'connect' event)
     </script>
 </body>
 
